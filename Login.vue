@@ -15,15 +15,10 @@
       <q-page
         class="flex flex-center q-px-md q-py-lg"
         :style="{
-          background: darkMode ? '#333' : '#fff',
+          background: darkMode ? '#333' : '#cfd4d2',
           color: darkMode ? '#fff' : '#000',
         }"
       >
-        <img
-          src="path_to_your_image.jpg"
-          alt="Background Curve"
-          class="absolute top-0 left-0 w-full"
-        />
         <q-card
           class="q-pa-lg shadow-2"
           :style="{
@@ -178,7 +173,7 @@ const handleRegister = () => {
 };
 
 function onSubmit() {
-  const url = "http://appdev/apiclient/vdev/api/access/user/validate";
+  const url = "";
   const dataObj = {
     username: email.value,
     password: password.value,
