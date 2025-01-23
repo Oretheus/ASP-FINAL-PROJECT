@@ -15,7 +15,7 @@
       <q-page
         class="flex flex-center q-px-md q-py-lg"
         :style="{
-          background: darkMode ? '#333' : '#cfd4d2',
+          background: darkMode ? '#333' : '#fff',
           color: darkMode ? '#fff' : '#000',
         }"
       >
