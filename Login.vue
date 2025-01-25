@@ -31,6 +31,7 @@
               : 'linear-gradient(to right, #6a11cb, #2575fc)',
           }"
         >
+        <!-- linear-gradient(135deg, #4e54c8, #8f94fb) -->
           <!-- Header -->
           <div class="text-center q-mb-md">
             <q-icon name="public" size="80px" color="white" />
@@ -169,7 +170,7 @@ const navigateToLogin = () => {
 };
 
 const handleRegister = () => {
-  router.push("/Register");
+  router.push("/");
 };
 
 function onSubmit() {
