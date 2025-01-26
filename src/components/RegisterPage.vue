@@ -5,130 +5,155 @@
 
     <!-- Form Layout -->
     <div class="form-layout">
+
       <!-- Left Section with Image and Text -->
       <div class="left-section">
         <div class="symbol-container">
           <img src="@/assets/earth.png" alt="Earth Icon" class="earth-icon" />
-          <p>Register here to make the world your oyster</p>
+          <p>The only place to make applying for internships, fun and rewarding</p>
+          <p>Register here to make the world your oyster!</p>
         </div>
       </div>
 
       <!-- Right Section with Registration Form -->
       <div class="form-section">
         <h2>Register</h2>
-        <form @submit.prevent="handleRegister">
-          <div class="form-group">
-            <input type="text" v-model="name" placeholder="First Name *" />
-            <small v-if="errors.name">{{ errors.name }}</small>
-          </div>
-          <div class="form-group">
-            <input type="email" v-model="email" placeholder="Your Email *" />
-            <small v-if="errors.email">{{ errors.email }}</small>
-          </div>
-          <div class="form-group">
-            <input type="password" v-model="password" placeholder="Password *" />
-            <small v-if="errors.password">{{ errors.password }}</small>
-            <!-- Password Strength Indicator -->
-            <div v-if="password" class="password-strength">
-              <span :class="strengthClass">{{ passwordStrength }}</span>
-            </div>
-          </div>
-          <div class="form-group">
-            <input
-              type="password"
-              v-model="confirmPassword"
-              placeholder="Confirm Password *"
-            />
-            <small v-if="errors.confirmPassword">{{ errors.confirmPassword }}</small>
-          </div>
-          <button type="submit" class="register-btn">Register</button>
-        </form>
+        <q-form @submit.prevent="handleRegister">
+          <q-input
+            v-model="name"
+            label="First Name *"
+            dense
+            outlined
+            :rules="[val => !!val || 'Name is required.']"
+          />
+          <q-input
+            v-model="email"
+            label="Your Email *"
+            type="email"
+            dense
+            outlined
+            :rules="[
+              val => !!val || 'Email is required.',
+              val => isValidEmail(val) || 'Enter a valid email.'
+            ]"
+          />
+          <q-input
+            v-model="password"
+            label="Password *"
+            type="password"
+            dense
+            outlined
+            :rules="[val => !!val || 'Password is required.']"
+          >
+            <template v-slot:after>
+              <div class="password-strength">
+                <span :class="strengthClass">{{ passwordStrength }}</span>
+              </div>
+            </template>
+          </q-input>
+          <q-input
+            v-model="confirmPassword"
+            label="Confirm Password *"
+            type="password"
+            dense
+            outlined
+            :rules="[
+              val => !!val || 'Confirm password is required.',
+              val => val === password || 'Passwords must match.'
+            ]"
+          />
+          <q-btn type="submit" label="Register" class="register-btn" />
+        </q-form>
       </div>
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      // Register form data
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      errors: {},
-    };
-  },
+<script setup>
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
 
-  computed: {
-    passwordStrength() {
-      if (this.password.length < 6) return 'Weak';
-      if (/[A-Z]/.test(this.password) && /[0-9]/.test(this.password)) return 'Medium';
-      if (this.password.length >= 8 && /[A-Z]/.test(this.password) && /[0-9]/.test(this.password) && /[^a-zA-Z0-9]/.test(this.password)) {
-        return 'Strong';
-      }
-      return 'Weak';
-    },
-    strengthClass() {
-      const strength = this.passwordStrength;
-      return {
-        'weak': strength === 'Weak',
-        'medium': strength === 'Medium',
-        'strong': strength === 'Strong',
-      };
-    },
-  },
+// State variables
+const name = ref("");
+const email = ref("");
+const password = ref("");
+const confirmPassword = ref("");
 
-  methods: {
-    redirectToLogin() {
-      this.$router.push('/login'); // Redirect to Login page
-    },
-    handleRegister() {
-      this.errors = {};
-      if (!this.name) this.errors.name = 'Name is required.';
-      if (!this.email || !/\S+@\S+\.\S+/.test(this.email)) this.errors.email = 'Valid email is required.';
-      if (!this.password) this.errors.password = 'Password is required.';
-      if (this.password !== this.confirmPassword)
-        this.errors.confirmPassword = 'Passwords do not match.';
-      if (Object.keys(this.errors).length === 0) {
-        alert('Registration successful!');
-      }
-    },
-  },
+// Vue Router
+const router = useRouter();
+
+// Password strength computation
+const passwordStrength = computed(() => {
+  const length = password.value.length;
+  const hasUppercase = /[A-Z]/.test(password.value);
+  const hasNumber = /[0-9]/.test(password.value);
+  const hasSpecialChar = /[^a-zA-Z0-9]/.test(password.value);
+
+  const meetsCriteria = hasUppercase && hasNumber && hasSpecialChar;
+
+  if (!meetsCriteria) return ;
+  if (length < 6) return "Weak";
+  if (length >= 6 && length <= 9) return "Medium";
+  if (length >= 10) return "Strong";
+
+  return "Weak";
+});
+
+
+
+const strengthClass = computed(() => {
+  const strength = passwordStrength.value;
+  return {
+    Weak: "weak",
+    Medium: "medium",
+    Strong: "strong",
+  }[strength];
+});
+
+// Redirect to login
+const redirectToLogin = () => {
+  router.push("/login");
+};
+
+// Email validation function
+const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+
+// Handle registration
+const handleRegister = () => {
+  if (!name.value || !email.value || !password.value || !confirmPassword.value) {
+    alert("All fields are required.");
+    return;
+  }
+  if (!isValidEmail(email.value)) {
+    alert("Enter a valid email.");
+    return;
+  }
+  if (password.value !== confirmPassword.value) {
+    alert("Passwords must match.");
+    return;
+  }
+  alert("Registration successful!");
+  router.push("/login");
 };
 </script>
 
 <style scoped>
-/* General Layout */
-.registration-container {
+/* Original Styling Preserved */
+.registration-container
+{
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Center vertically */
-  align-items: center; /* Center horizontally */
-  min-height: 100vh; /* Full height */
-  background: linear-gradient(135deg, #6a0dad, #b19cd9); /* Purple to lilac gradient */
-  font-family: Arial, sans-serif;
-  position: relative;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
   padding: 20px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #6a0dad, #b19cd9);
+  position: relative;
 }
 
-.password-strength {
-  margin-top: 5px;
-  font-size: 12px;
-}
-.password-strength .weak {
-  color: red;
-}
-.password-strength .medium {
-  color: orange;
-}
-.password-strength .strong {
-  color: green;
-}
-
-/* Redirect Button */
-.login-btn {
+.login-btn
+{
   position: absolute;
   top: 20px;
   right: 20px;
@@ -142,25 +167,25 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.login-btn:hover {
-  background: #f3f3f3;
+.login-btn:hover
+{
+  color: white;
+  background: #6a0dad;
 }
 
-/* Form Layout */
-.form-layout {
+.form-layout 
+{
   display: flex;
   width: 90%;
   max-width: 1200px;
-  height: auto;
   background: white;
-  border-radius: 16px 0 0 16px; /* Rounded left side */
+  border-radius: 16px 0 0 16px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   overflow: hidden;
-  align-items: center; /* Center vertically */
 }
 
-/* Left Section */
-.left-section {
+.left-section
+{
   flex: 1;
   background: #6a0dad;
   color: white;
@@ -172,63 +197,42 @@ export default {
   padding: 20px;
 }
 
-.symbol-container {
+.symbol-container
+{
   max-width: 200px;
 }
 
-.earth-icon {
+.earth-icon
+{
   width: 100px;
   height: 100px;
   margin-bottom: 20px;
 }
 
-.symbol-container p {
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 1.5;
-}
-
-/* Right Section */
-.form-section {
+.form-section
+{
   flex: 1.5;
   padding: 40px;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Center vertically */
+  justify-content: center;
 }
 
-h2 {
+h2
+{
   font-size: 24px;
   margin-bottom: 20px;
   color: #6a0dad;
   text-align: center;
 }
 
-.form-group {
+.q-input
+{
   margin-bottom: 15px;
 }
 
-input {
-  width: 100%;
-  padding: 12px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-sizing: border-box;
-}
-
-input:focus {
-  outline: none;
-  border-color: #6a0dad;
-  box-shadow: 0 0 5px rgba(106, 13, 173, 0.5);
-}
-
-small {
-  color: red;
-  font-size: 12px;
-}
-
-.register-btn {
+.register-btn
+{
   width: 100%;
   background-color: #6a0dad;
   color: white;
@@ -240,7 +244,30 @@ small {
   margin-top: 15px;
 }
 
-.register-btn:hover {
+.register-btn:hover
+{
   background-color: #5e0cb0;
+}
+
+/* Password strength indicator */
+.password-strength
+{
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.password-strength .weak
+{
+  color: red;
+}
+
+.password-strength .medium
+{
+  color: orange;
+}
+
+.password-strength .strong
+{
+  color: green;
 }
 </style>
