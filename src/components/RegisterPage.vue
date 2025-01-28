@@ -47,7 +47,7 @@
           >
             <template v-slot:after>
               <div class="password-strength">
-                <span :class="strengthClass">{{ passwordStrength }}</span>
+                <span v-if="passwordStrength" :class="strengthClass">{{ passwordStrength }}</span>
               </div>
             </template>
           </q-input>
@@ -70,6 +70,7 @@
 </template>
 
 <script setup>
+import axios from "axios";
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 
@@ -84,6 +85,8 @@ const router = useRouter();
 
 // Password strength computation
 const passwordStrength = computed(() => {
+  if (!password.value) return ""; // No strength displayed for empty password
+
   const length = password.value.length;
   const hasUppercase = /[A-Z]/.test(password.value);
   const hasNumber = /[0-9]/.test(password.value);
@@ -91,10 +94,10 @@ const passwordStrength = computed(() => {
 
   const meetsCriteria = hasUppercase && hasNumber && hasSpecialChar;
 
-  if (!meetsCriteria) return ;
-  if (length < 6) return "Weak";
-  if (length >= 6 && length <= 9) return "Medium";
-  if (length >= 10) return "Strong";
+  // if (!meetsCriteria) return "Weak";
+  if (!meetsCriteria || length < 6) return "Weak";
+  if (length >= 6 && length <= 12) return "Medium";
+  if (length > 12) return "Strong";
 
   return "Weak";
 });
@@ -119,7 +122,7 @@ const redirectToLogin = () => {
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 // Handle registration
-const handleRegister = () => {
+const handleRegister = async () => {
   if (!name.value || !email.value || !password.value || !confirmPassword.value) {
     alert("All fields are required.");
     return;
@@ -132,13 +135,34 @@ const handleRegister = () => {
     alert("Passwords must match.");
     return;
   }
-  alert("Registration successful!");
-  router.push("/login");
+
+  try {
+    // API call to register the user
+    const response = await axios.post("http://localhost:8000/v1/user/register", {
+      username: name.value, // User's name
+      email: email.value,   // User's email
+      password: password.value, // User's password
+      role: "user",         // Default role
+    });
+
+    // On success
+    alert("Registration successful!");
+    console.log("Response:", response.data);
+
+    // Redirect to login page
+    router.push("/login");
+  } catch (error) {
+    // Handle errors from the backend
+    console.error("Full error:", error);
+  alert(`Error: ${error.response?.data?.detail || error.message || "Unknown error"}`);
+  }
 };
+
+
 </script>
 
 <style scoped>
-/* Original Styling Preserved */
+/* Original Styling */
 .registration-container
 {
   display: flex;
