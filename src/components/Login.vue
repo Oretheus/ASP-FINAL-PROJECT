@@ -174,64 +174,6 @@ const handleRegister = () => {
   router.push("/");
 };
 
-// function onSubmit() {
-//   console.log("Email:", email.value);
-//   console.log("Password:", password.value);
-
-//   // Validate inputs
-//   if (!isValidEmail(email.value) || !password.value) {
-//     errorMessage.value = "Please fill in all required fields with valid values.";
-//     console.error("Validation Error:", errorMessage.value);
-//     return;
-//   }
-
-//   // Prepare the request payload
-//   const dataObj = {
-//     email: email.value,
-//     password: password.value,
-//   };
-
-//   // Mocking API response for testing
-//   setTimeout(() => {
-//     // Simulating a successful response
-//     const mockResponse = {
-      
-//         message: "Login successful",
-//         access_token: "mock-jwt-token", // Mock token
-//         token_type: "bearer"
-      
-//     };
-
-//     console.log("Login Response:", mockResponse);
-
-//     // Handle success
-//     if (mockResponse && mockResponse.access_token) {
-//       console.log(mockResponse.message);
-//       localStorage.setItem("authToken", mockResponse.access_token);
-//       router.push("/dashboard");
-//     } else {
-//       errorMessage.value = "Unexpected response format.";
-//       console.warn("Unexpected Response Format:", mockResponse);
-//     }
-//   }, 1000); 
-
-  // Uncomment the following lines to test the actual backend once it's available:
-  // axios
-  //   .post("https://api/v1/login", dataObj)
-  //   .then(function(response) {
-  //     console.log("Login Response:", response.data);
-  //     if (response.data && response.data.access_token) {
-  //       localStorage.setItem("authToken", response.data.token);
-  //       router.push("/dashboard");
-  //     }
-  //   })
-  //   .catch(function(error) {
-  //     console.error("Login Failed:", error.response?.data || error.message);
-  //     errorMessage.value = error.response?.data?.message || "Login failed. Please try again.";
-  //   });
-// }
-
-
 function onSubmit() {
   console.log(" Email:", email.value);
   console.log(" password:", password.value);
