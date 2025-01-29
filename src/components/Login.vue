@@ -31,6 +31,7 @@
               : 'linear-gradient(to right, #6a11cb, #2575fc)',
           }"
         >
+        <!-- linear-gradient(135deg, #4e54c8, #8f94fb) -->
           <!-- Header -->
           <div class="text-center q-mb-md">
             <q-icon name="public" size="80px" color="white" />
@@ -153,8 +154,9 @@
 
 <script setup>
 import { ref } from "vue";
-import RegisterPage from "@/components/RegisterPage.vue"; //changed path 23/01
+import Register from "@/components/Register.vue";
 import { useRouter } from "vue-router";
+import axios from 'axios';
 
 const email = ref("");
 const password = ref("");
@@ -169,16 +171,107 @@ const navigateToLogin = () => {
 };
 
 const handleRegister = () => {
-  router.push("/RegisterPage"); //changed path 23/01
+  router.push("/");
 };
 
+// function onSubmit() {
+//   console.log("Email:", email.value);
+//   console.log("Password:", password.value);
+
+//   // Validate inputs
+//   if (!isValidEmail(email.value) || !password.value) {
+//     errorMessage.value = "Please fill in all required fields with valid values.";
+//     console.error("Validation Error:", errorMessage.value);
+//     return;
+//   }
+
+//   // Prepare the request payload
+//   const dataObj = {
+//     email: email.value,
+//     password: password.value,
+//   };
+
+//   // Mocking API response for testing
+//   setTimeout(() => {
+//     // Simulating a successful response
+//     const mockResponse = {
+      
+//         message: "Login successful",
+//         access_token: "mock-jwt-token", // Mock token
+//         token_type: "bearer"
+      
+//     };
+
+//     console.log("Login Response:", mockResponse);
+
+//     // Handle success
+//     if (mockResponse && mockResponse.access_token) {
+//       console.log(mockResponse.message);
+//       localStorage.setItem("authToken", mockResponse.access_token);
+//       router.push("/dashboard");
+//     } else {
+//       errorMessage.value = "Unexpected response format.";
+//       console.warn("Unexpected Response Format:", mockResponse);
+//     }
+//   }, 1000); 
+
+  // Uncomment the following lines to test the actual backend once it's available:
+  // axios
+  //   .post("https://api/v1/login", dataObj)
+  //   .then(function(response) {
+  //     console.log("Login Response:", response.data);
+  //     if (response.data && response.data.access_token) {
+  //       localStorage.setItem("authToken", response.data.token);
+  //       router.push("/dashboard");
+  //     }
+  //   })
+  //   .catch(function(error) {
+  //     console.error("Login Failed:", error.response?.data || error.message);
+  //     errorMessage.value = error.response?.data?.message || "Login failed. Please try again.";
+  //   });
+// }
+
+
 function onSubmit() {
-  const url = "";
+  console.log(" Email:", email.value);
+  console.log(" password:", password.value);
+
+  // Validate inputs
+  if (!isValidEmail(email.value) || !password.value) {
+    errorMessage.value = "Please fill in all required fields with valid values.";
+    console.error("Validation Error:", errorMessage.value);
+    return;
+  }
+
+  // request payload
   const dataObj = {
-    username: email.value,
+    email: email.value,
     password: password.value,
   };
+
+  axios
+    .post("http://127.0.0.1:8000/v1/user/login", dataObj) 
+    .then(function(response) {
+      console.log("Login Response:", response.data);
+
+      // Handle success
+      if (response && response.access_token) {
+        console.log(response.data.message);
+        localStorage.setItem("authToken", response.access_token); 
+        router.push("/dashboard"); 
+      } else {
+        errorMessage.value = "Unexpected response format.";
+        console.warn("Unexpected Response Format:", response.value);
+      }
+    })
+    .catch(function(error) {
+      // Handle error
+      console.error("Login Failed:", error.response?.data || error.message);
+      errorMessage.value =
+        error.response?.data?.message || "Login failed. Please try again.";
+    });
 }
+
 
 function togglePasswordVisibility() {
   passwordVisible.value = !passwordVisible.value;
