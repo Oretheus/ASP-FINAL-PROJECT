@@ -34,7 +34,9 @@
           <!-- linear-gradient(135deg, #4e54c8, #8f94fb) -->
           <!-- Header -->
           <div class="text-center q-mb-md">
-            <q-icon name="public" size="80px" color="white" />
+            <q-avatar size="80px">
+              <img src="@/assets/earth.png" alt="Earth Icon" class="earth-icon" />
+            </q-avatar>
             <div class="text-h6 text-white">Welcome</div>
             <div class="text-body2 text-white">
               If you already have an account login
@@ -89,6 +91,7 @@
                     :name="passwordVisible ? 'visibility_off' : 'visibility'"
                     @click="togglePasswordVisibility"
                     class="cursor-pointer"
+                    :color="passwordVisible ? 'red' : '#fff'"
                   />
                 </template>
               </q-input>
@@ -157,7 +160,7 @@ import { ref } from "vue";
 import Register from "@/components/Register.vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
-
+// import { useQuasar } from "quasar";
 const email = ref("");
 const password = ref("");
 const passwordVisible = ref(false);
@@ -176,7 +179,8 @@ function onSubmit() {
 
   // Validate inputs
   if (!isValidEmail(email.value) || !password.value) {
-    errorMessage.value = "Please fill in all required fields with valid values.";
+    errorMessage.value =
+      "Please fill in all required fields with valid values.";
     console.error("Validation Error:", errorMessage.value);
     return;
   }
@@ -195,8 +199,8 @@ function onSubmit() {
       // Handle success
       if (response.data && response.data.access_token) {
         console.log(response.data.message);
-        localStorage.setItem("authToken", response.data.access_token); // Store token
-        router.push("/dashboard"); // Redirect to dashboard
+        localStorage.setItem("authToken", response.data.access_token);
+        router.push("/dashboard");
       } else {
         errorMessage.value = "Unexpected response format.";
         console.warn("Unexpected Response Format:", response.data);
@@ -209,7 +213,6 @@ function onSubmit() {
         error.response?.data?.message || "Login failed. Please try again.";
     });
 }
-
 
 function togglePasswordVisibility() {
   passwordVisible.value = !passwordVisible.value;
@@ -233,4 +236,8 @@ const isValidEmail = (value) => {
   backdrop-filter: blur(5px);
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
 }
+/* .q-input {
+  border-radius: 130px;
+  background-color: rgba(255, 255, 255, 0.1);
+} */
 </style>
