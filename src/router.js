@@ -19,6 +19,7 @@ const routes = [
     path: '/Candidate',
     name: 'CandidatePage',
     component: CandidatePage,
+  }
   
   ];
 
