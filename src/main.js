@@ -1,8 +1,16 @@
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router';
+import { createApp } from "vue";
+import { Quasar } from "quasar";
+import { useDialogPluginComponent } from 'quasar'
+import router from './router/router.js';
 
-const app = createApp(App);
-app.use(router);
-app.mount('#app');
+// Import Quasar css
+import 'quasar/src/css/index.sass'
 
+import App from './App.vue'
+
+createApp(App)
+  .use(Quasar, {
+    plugins: {}
+  })
+  .use(router)
+  .mount("#app");
