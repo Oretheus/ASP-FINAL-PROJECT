@@ -1,5 +1,8 @@
 from fastapi import FastAPI
-from v1.endpoints import users, search
+
+# Explicitly import the routers from the correct files
+from v1.endpoints.users import users
+from v1.endpoints.search import search
 
 # Initialize the app
 app = FastAPI(
@@ -9,8 +12,8 @@ app = FastAPI(
 )
 
 # V1 routes
-app.include_router(users.router, prefix="/v1/user", tags=["users"])
-app.include_router(search.router, prefix="/v1/search", tags=["search"])
+app.include_router(users, prefix="/v1/user", tags=["users"])
+app.include_router(search, prefix="/v1/search", tags=["search"])
 
 # Root endpoint
 @app.get("/")
