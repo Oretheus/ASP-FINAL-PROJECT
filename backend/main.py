@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-# Explicitly import the routers from the correct files
-from v1.endpoints.users import users
-from v1.endpoints.search import search
+# Attempting absolute imports
+from backend.v1.endpoints.users import users
+from backend.v1.endpoints.search import search
 
 # Initialize the app
 app = FastAPI(
