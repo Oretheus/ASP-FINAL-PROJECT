@@ -1,9 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends
-from v1.shared.user_manager import UserManager
-from v1.shared.firebase_manager import FirebaseManager
-from v1.shared.models import UserRegister, UserLogin, AddAPIKey
-from v1.shared.token_manager import TokenManager
-from v1.shared.rbac_manager import RBACManager
+from backend.v1.shared.user_manager import UserManager
+from backend.v1.shared.firebase_manager import FirebaseManager
+from backend.v1.shared.models import UserRegister, UserLogin, AddAPIKey
+from backend.v1.shared.token_manager import TokenManager
+from backend.v1.shared.rbac_manager import RBACManager
+
+
 
 router = APIRouter()
 firebase_manager = FirebaseManager()
