@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-# Attempting absolute imports
-from backend.v1.endpoints.users import users
-from backend.v1.endpoints.search import search
+# Attempting to correct imports
+from backend.v1.endpoints.users import router as users_router
+from backend.v1.endpoints.search import router as search_router
 
 # Initialize the app
 app = FastAPI(
@@ -12,8 +12,8 @@ app = FastAPI(
 )
 
 # V1 routes
-app.include_router(users, prefix="/v1/user", tags=["users"])
-app.include_router(search, prefix="/v1/search", tags=["search"])
+app.include_router(users_router, prefix="/v1/user", tags=["users"])
+app.include_router(search_router, prefix="/v1/search", tags=["search"])
 
 # Root endpoint
 @app.get("/")
