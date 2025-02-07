@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from v1.shared.api_manager import APIManager
+from backend.v1.shared.api_manager import APIManager
 
 class SearchManager:
     def __init__(self, firebase_manager, api_manager):
