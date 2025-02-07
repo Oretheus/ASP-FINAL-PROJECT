@@ -18,7 +18,7 @@ app.include_router(users_router, prefix="/v1/user", tags=["users"])
 app.include_router(search_router, prefix="/v1/search", tags=["search"])
 
 # Root endpoint (Added methods)
-@app.get("/", methods=["GET", "HEAD"]) 
+@app.get("/") 
 async def root():
     """
     Root endpoint to confirm API is running.
