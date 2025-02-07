@@ -2,8 +2,8 @@ import uuid
 from fastapi import HTTPException
 from datetime import datetime, timezone
 from passlib.context import CryptContext
-from v1.shared.firebase_manager import FirebaseManager
-from v1.shared.token_manager import TokenManager
+from backend.v1.shared.firebase_manager import FirebaseManager
+from backend.v1.shared.token_manager import TokenManager
 
 class UserManager:
     def __init__(self, firebase_manager: FirebaseManager):
