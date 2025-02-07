@@ -17,8 +17,8 @@ app = FastAPI(
 app.include_router(users_router, prefix="/v1/user", tags=["users"])
 app.include_router(search_router, prefix="/v1/search", tags=["search"])
 
-# Root endpoint
-@app.get("/")
+# Root endpoint (Added methods)
+@app.get("/", methods=["GET", "HEAD"]) 
 async def root():
     """
     Root endpoint to confirm API is running.
