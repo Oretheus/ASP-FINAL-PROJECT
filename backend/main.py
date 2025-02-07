@@ -1,3 +1,5 @@
+import os
+import uvicorn
 from fastapi import FastAPI
 
 # Attempting to correct imports
@@ -26,3 +28,7 @@ async def root():
         "available_versions": ["v1"], #["v1", "v2"],
         "documentation_url": "/docs",
     }
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))  # Render provides PORT env variable
+    uvicorn.run(app, host="0.0.0.0", port=port)
