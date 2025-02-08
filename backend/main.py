@@ -3,9 +3,6 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-# Setting Favicon 
-app.mount("/static", StaticFiles(directory="backend/static"), name="static")
-
 # Importing route handlers
 from backend.v1.endpoints.users import router as users_router
 from backend.v1.endpoints.search import router as search_router
@@ -16,6 +13,9 @@ app = FastAPI(
     description="MVP version support",
     version="1.0.0",
 )
+
+# Setting Favicon 
+app.mount("/static", StaticFiles(directory="backend/static"), name="static")
 
 # Include V1 API routers
 app.include_router(users_router, prefix="/v1/user", tags=["users"])
