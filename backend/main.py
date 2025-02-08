@@ -38,5 +38,5 @@ async def head_root():
     return {}
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))  # Render provides PORT env variable
-    uvicorn.run(app, host="0.0.0.0", port=port, log_level="debug")
+    port = int(os.environ.get("PORT", 10000))  # Default to 10000 in case PORT is missing
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
