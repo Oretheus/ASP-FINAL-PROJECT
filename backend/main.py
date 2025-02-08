@@ -1,6 +1,10 @@
 import os
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+
+# Setting Favicon 
+app.mount("/static", StaticFiles(directory="backend/static"), name="static")
 
 # Importing route handlers
 from backend.v1.endpoints.users import router as users_router
