@@ -2,6 +2,8 @@ import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+
 
 # Importing route handlers
 from backend.v1.endpoints.users import router as users_router
@@ -20,6 +22,19 @@ app.mount("/static", StaticFiles(directory="backend/static"), name="static")
 # Include V1 API routers
 app.include_router(users_router, prefix="/v1/user", tags=["users"])
 app.include_router(search_router, prefix="/v1/search", tags=["search"])
+
+# Enable CORS (important if frontend calls the API)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Change this to your frontend URL for security
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Vercel requires exposing an `app` object (no need to run uvicorn manually)
+def handler(event, context):
+    return app
 
 # Root endpoint
 @app.get("/", include_in_schema=False)
