@@ -15,10 +15,9 @@ class UserManager:
         Fetch user information from Firebase by user_id.
         """
         user_doc = self.firebase_manager.get_data("users", user_id)
-        if "error" in user_doc:
+        if not user_doc or "error" in user_doc:
             return None
         return user_doc
-
 
     def register(self, username: str, email: str, password: str, role: str = "user"):
         """
