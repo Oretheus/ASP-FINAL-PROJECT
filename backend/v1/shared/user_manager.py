@@ -1,4 +1,5 @@
 import uuid
+import threading
 from fastapi import HTTPException
 from datetime import datetime, timezone
 from passlib.context import CryptContext
@@ -12,12 +13,27 @@ class UserManager:
 
     def get_user_by_id(self, user_id: str):
         """
-        Fetch user information from Firebase by user_id.
+        Fetch user information from Firebase by user_id with a timeout.
         """
-        user_doc = self.firebase_manager.get_data("users", user_id)
-        if not user_doc or "error" in user_doc:
+        user_data = {}
+    
+        def fetch_data():
+            nonlocal user_data
+            user_doc = self.firebase_manager.get_data("users", user_id)
+            if not user_doc or "error" in user_doc:
+                user_data = None
+            else:
+                user_data = user_doc
+    
+        thread = threading.Thread(target=fetch_data)
+        thread.start()
+        thread.join(timeout=5)  # Timeout set to 5 seconds
+    
+        if thread.is_alive():
+            # Timeout occurred
             return None
-        return user_doc
+    
+        return user_data
 
     def register(self, username: str, email: str, password: str, role: str = "user"):
         """
