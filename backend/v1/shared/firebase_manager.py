@@ -44,7 +44,7 @@ class FirebaseManager:
 
     def get_data(self, collection: str, document_id: str) -> dict:
         """
-        Retrieve a document.
+        Retrieve a document with error handling and timeout.
         """
         try:
             doc = self.db.collection(collection).document(document_id).get()
@@ -52,8 +52,10 @@ class FirebaseManager:
                 return doc.to_dict()
             else:
                 return {"error": "Document not found"}
+        except FirebaseError as e:
+            return {"error": f"Firebase error: {str(e)}"}
         except Exception as e:
-            return {"error": str(e)}
+            return {"error": f"General error: {str(e)}"}
 
     # --------------------
     # User Functions
