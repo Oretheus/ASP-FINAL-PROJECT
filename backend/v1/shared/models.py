@@ -7,10 +7,6 @@ class UserRegister(BaseModel):
     password: str
     role: Optional[str] = "user" # Default role
 
-class UserLogin(BaseModel):
-    email: str
-    password: str
-
 class AddAPIKey(BaseModel):
     apikey: str
 
