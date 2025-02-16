@@ -11,20 +11,19 @@ router = APIRouter()
 firebase_manager = FirebaseManager()
 user_manager = UserManager(firebase_manager)
 
-
 @router.get("/{user_id}")
 async def get_user(user_id: str):
     """
-    Retrieve user details by user_id (with timeout).
+    Retrieve user details by user_id (with async timeout).
     """
     try:
         user_data = await asyncio.wait_for(
-            asyncio.to_thread(user_manager.get_user_by_id, user_id),
-            timeout=5.0  # Set timeout to 5 seconds
+            user_manager.get_user_by_id(user_id),
+            timeout=10.0  # Allow longer timeout
         )
     except asyncio.TimeoutError:
-        raise HTTPException(status_code=504, detail="Request timed out")
-    
+        raise HTTPException(status_code=504, detail="Firebase request timed out")
+
     if not user_data:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -32,7 +31,6 @@ async def get_user(user_id: str):
     user_data.pop("serp_api_key", None)
 
     return user_data
-
 
 @router.post("/register")
 async def register_user(user: UserRegister):
