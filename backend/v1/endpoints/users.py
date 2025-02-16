@@ -12,23 +12,18 @@ firebase_manager = FirebaseManager()
 user_manager = UserManager(firebase_manager)
 
 @router.get("/{user_id}")
-async def get_user(user_id: str, user: dict = Depends(TokenManager.get_current_user)):
+async def get_user(user_id: str):
     """
-    Retrieve user information by user_id (requires auth).
-    Only admin or the user themselves can view user details.
+    Retrieve user details by user_id (Public Access).
     """
-    # Authorization Check
-    if user.get("user_id") != user_id and not RBACManager.has_role(user, "admin"):
-        raise HTTPException(status_code=403, detail="Permission denied")
-
     user_data = user_manager.get_user_by_id(user_id)
     if not user_data:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Hide sensitive fields before returning
+    # Hide sensitive fields
     user_data.pop("password_hash", None)
     user_data.pop("serp_api_key", None)
-    
+
     return user_data
 
 @router.post("/register")
