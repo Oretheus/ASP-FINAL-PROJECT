@@ -26,15 +26,11 @@ app.include_router(search_router, prefix="/v1/search", tags=["search"])
 # Enable CORS (important if frontend calls the API)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Change this to your frontend URL for security
+    allow_origins=["https://asp-final-project.onrender.com/"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Vercel requires exposing an `app` object (no need to run uvicorn manually)
-def handler(event, context):
-    return app
 
 # Root endpoint
 @app.get("/", include_in_schema=False)
