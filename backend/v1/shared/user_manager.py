@@ -19,6 +19,7 @@ class UserManager:
             return None
         return user_doc
 
+
     def register(self, username: str, email: str, password: str, role: str = "user"):
         """
         Register a new user.
