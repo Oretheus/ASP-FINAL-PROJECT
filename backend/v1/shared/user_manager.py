@@ -11,13 +11,13 @@ class UserManager:
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     def get_user_by_id(self, user_id: str):
-    """
-    Fetch user information from Firebase by user_id.
-    """
-    user_doc = self.firebase_manager.get_data("users", user_id)
-    if "error" in user_doc:
-        return None
-    return user_doc
+        """
+        Fetch user information from Firebase by user_id.
+        """
+        user_doc = self.firebase_manager.get_data("users", user_id)
+        if "error" in user_doc:
+            return None
+        return user_doc
 
     def register(self, username: str, email: str, password: str, role: str = "user"):
         """
