@@ -15,13 +15,12 @@ user_manager = UserManager(firebase_manager)
 @router.get("/{user_id}")
 async def get_user(user_id: str):
     """
-    Retrieve user details by user_id (Public Access).
+    Retrieve user details by user_id (with timeout).
     """
     try:
-        # Add timeout to prevent infinite loading
         user_data = await asyncio.wait_for(
             asyncio.to_thread(user_manager.get_user_by_id, user_id),
-            timeout=5.0
+            timeout=5.0  # Set timeout to 5 seconds
         )
     except asyncio.TimeoutError:
         raise HTTPException(status_code=504, detail="Request timed out")
@@ -29,7 +28,6 @@ async def get_user(user_id: str):
     if not user_data:
         raise HTTPException(status_code=404, detail="User not found")
 
-    # Hide sensitive fields
     user_data.pop("password_hash", None)
     user_data.pop("serp_api_key", None)
 
