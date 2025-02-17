@@ -9,7 +9,7 @@ import asyncio
 import logging
 
 load_dotenv()
-cred_path = os.getenv("FIREBASE_CRED_PATH")
+cred_path = os.getenv("FIREBASE_CREDENTIALS")
 
 class FirebaseClient:
     _instance = None
