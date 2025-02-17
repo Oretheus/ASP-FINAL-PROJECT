@@ -1,6 +1,5 @@
 import os
 import uuid
-from dotenv import load_dotenv
 from datetime import datetime, timezone
 from typing import List, Optional
 import firebase_admin
@@ -8,18 +7,16 @@ from firebase_admin import credentials, firestore, initialize_app, exceptions
 import asyncio
 import logging
 
-load_dotenv()
-cred_path = os.getenv("/etc/secrets/FIREBASE_CREDENTIALS.json")
-
 class FirebaseClient:
     _instance = None
 
     @staticmethod
     def get_instance():
         if FirebaseClient._instance is None:
+            cred_path = "/etc/secrets/FIREBASE_CREDENTIALS.json"
             if not cred_path or not os.path.exists(cred_path):
                 raise FileNotFoundError(
-                    f"Verify Firebase credential path in .env file."
+                    f"Missing Firebase credentials file at {cred_path}."
                 )
             # Initialize Firebase client
             cred = credentials.Certificate(cred_path)
