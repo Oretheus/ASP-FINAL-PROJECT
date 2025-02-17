@@ -6,6 +6,7 @@ from typing import List, Optional
 import firebase_admin
 from firebase_admin import credentials, firestore, initialize_app, exceptions
 import asyncio
+import logging
 
 load_dotenv()
 cred_path = os.getenv("FIREBASE_CRED_PATH")
@@ -27,9 +28,36 @@ class FirebaseClient:
         
         return FirebaseClient._instance
 
+    @staticmethod
+    def test_connection():
+        """
+        Test Firebase connection by retrieving a document from a test collection.
+        """
+        try:
+            db = FirebaseClient.get_instance()
+            test_doc = db.collection("test_collection").document("test_doc").get()
+            if test_doc.exists:
+                logging.info("Firebase connection test successful.")
+                return {"status": "connected", "message": "Firebase connection successful", "sample_data": test_doc.to_dict()}
+            else:
+                logging.warning("Firebase connection successful, but test document not found.")
+                return {"status": "connected", "message": "Firebase connection successful, but document not found"}
+        except exceptions.FirebaseError as e:
+            logging.error(f"Firebase connection error: {e}")
+            return {"status": "error", "message": f"Firebase error: {e}"}
+        except Exception as e:
+            logging.error(f"General connection error: {e}")
+            return {"status": "error", "message": f"General error: {e}"}
+
 class FirebaseManager:
     def __init__(self):
         self.db = FirebaseClient.get_instance() # Initialize Client
+
+    def test_firebase_connection(self) -> dict:
+        """
+        Test Firebase connection using the FirebaseClient's test_connection method.
+        """
+        return FirebaseClient.test_connection()
 
     # --------------------
     # CRUD Functions
