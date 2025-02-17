@@ -43,11 +43,22 @@ class UserManager:
             raise HTTPException(status_code=500, detail=result["error"])
         return {"message": "User registered successfully", "user_id": user_id}
 
-    def login(self, email: str, password: str):
+    def login(self, username: str, password: str):
         """
         Authenticate a user.
         """
-        user_data = self.firebase_manager.get_user_data("users", email)
+        # Identify whether username is an email or username
+        if "@" in username:
+            # Search by email
+            user_data = self.firebase_manager.get_user_data("users", username)
+        else:
+            # Search by username
+            user_docs = self.firebase_manager.db.collection("users").where("username", "==", username).stream()
+            user_data = None
+            for doc in user_docs:
+                user_data = doc.to_dict()
+                break
+            
         if not user_data:
             raise HTTPException(status_code=404, detail="User not found")
 

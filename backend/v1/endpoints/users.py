@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Form
 from backend.v1.shared.user_manager import UserManager
 from backend.v1.shared.firebase_manager import FirebaseManager
-from backend.v1.shared.models import UserRegister, UserLogin, AddAPIKey
+from backend.v1.shared.models import UserRegister, AddAPIKey
 from backend.v1.shared.token_manager import TokenManager
 from backend.v1.shared.rbac_manager import RBACManager
 import asyncio
+
 
 
 router = APIRouter()
@@ -45,11 +46,11 @@ async def register_user(user: UserRegister):
     )
 
 @router.post("/login")
-async def login_user(user: UserLogin):
+async def login_user(username: str = Form(...), password: str = Form(...)):
     """
     Login and return a token.
     """
-    return user_manager.login(email=user.email, password=user.password)
+    return user_manager.login(username=username, password=password)
 
 @router.put("/apikey")
 async def add_apikey(apikey_request: AddAPIKey, user: dict = Depends(TokenManager.get_current_user)):
