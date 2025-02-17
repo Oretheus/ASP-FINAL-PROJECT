@@ -3,7 +3,9 @@ import uuid
 from dotenv import load_dotenv
 from datetime import datetime, timezone
 from typing import List, Optional
-from firebase_admin import credentials, firestore, initialize_app
+import firebase_admin
+from firebase_admin import credentials, firestore, initialize_app, exceptions
+import asyncio
 
 load_dotenv()
 cred_path = os.getenv("FIREBASE_CRED_PATH")
@@ -44,7 +46,7 @@ class FirebaseManager:
 
     def get_data(self, collection: str, document_id: str) -> dict:
         """
-        Retrieve a document.
+        Retrieve a document with error handling and timeout.
         """
         try:
             doc = self.db.collection(collection).document(document_id).get()
@@ -52,8 +54,28 @@ class FirebaseManager:
                 return doc.to_dict()
             else:
                 return {"error": "Document not found"}
+        except FirebaseError as e:
+            return {"error": f"Firebase error: {str(e)}"}
         except Exception as e:
-            return {"error": str(e)}
+            return {"error": f"General error: {str(e)}"}
+
+    async def async_get_data(self, collection: str, document_id: str) -> dict:
+        """
+        Retrieve a document asynchronously from Firebase.
+        """
+        try:
+            loop = asyncio.get_event_loop()
+            doc = await loop.run_in_executor(None, 
+                lambda: self.db.collection(collection).document(document_id).get()
+            )
+            if doc.exists:
+                return doc.to_dict()
+            else:
+                return {"error": "Document not found"}
+        except exceptions.FirebaseError as e:
+            return {"error": f"Firebase error: {str(e)}"}
+        except Exception as e:
+            return {"error": f"General error: {str(e)}"}
 
     # --------------------
     # User Functions

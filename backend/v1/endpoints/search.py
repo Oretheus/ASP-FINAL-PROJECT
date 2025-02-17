@@ -34,3 +34,18 @@ async def search_jobs(search_request: JobSearchRequest, user: dict = Depends(Tok
             search_request.query,
             search_request.location,
         )
+
+@router.get("/job/{job_id}")
+async def get_job_details(job_id: str, user: dict = Depends(TokenManager.get_current_user)):
+    """
+    Fetch job details by job_id.
+    """
+    # Check roles
+    RBACManager.require_role(user, ["user", "admin"])
+
+    # Fetch job from Firebase
+    job_data = firebase_manager.fetch_job(job_id)
+    if "error" in job_data:
+        raise HTTPException(status_code=404, detail=job_data["error"])
+
+    return {"job_id": job_id, "job_details": job_data}

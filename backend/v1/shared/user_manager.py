@@ -1,14 +1,25 @@
 import uuid
+import threading
 from fastapi import HTTPException
 from datetime import datetime, timezone
 from passlib.context import CryptContext
 from backend.v1.shared.firebase_manager import FirebaseManager
 from backend.v1.shared.token_manager import TokenManager
+import asyncio
 
 class UserManager:
     def __init__(self, firebase_manager: FirebaseManager):
         self.firebase_manager = firebase_manager
         self.pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+    async def get_user_by_id(self, user_id: str):
+        """
+        Fetch user information asynchronously from Firebase by user_id.
+        """
+        user_data = await self.firebase_manager.async_get_data("users", user_id)
+        if not user_data or "error" in user_data:
+            return None
+        return user_data
 
     def register(self, username: str, email: str, password: str, role: str = "user"):
         """

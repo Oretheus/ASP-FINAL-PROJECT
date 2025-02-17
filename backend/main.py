@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # Importing route handlers
 from backend.v1.endpoints.users import router as users_router
 from backend.v1.endpoints.search import router as search_router
+from backend.v1.endpoints.test_routes import router as test_router
 
 # Initialize the FastAPI app
 app = FastAPI(
@@ -22,19 +23,16 @@ app.mount("/static", StaticFiles(directory="backend/static"), name="static")
 # Include V1 API routers
 app.include_router(users_router, prefix="/v1/user", tags=["users"])
 app.include_router(search_router, prefix="/v1/search", tags=["search"])
+app.include_router(test_router, prefix="/v1/test", tags=["test"])
 
 # Enable CORS (important if frontend calls the API)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Change this to your frontend URL for security
+    allow_origins=["https://asp-final-project.onrender.com/"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Vercel requires exposing an `app` object (no need to run uvicorn manually)
-def handler(event, context):
-    return app
 
 # Root endpoint
 @app.get("/", include_in_schema=False)
@@ -59,3 +57,5 @@ async def head_root():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))  # Default to 10000 in case PORT is missing
     uvicorn.run(app, host="0.0.0.0", port=port, log_level="info")
+
+
