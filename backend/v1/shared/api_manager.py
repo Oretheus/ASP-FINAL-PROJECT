@@ -1,4 +1,5 @@
 import requests
+import os
 
 class APIManager:
     def __init__(self):
