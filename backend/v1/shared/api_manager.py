@@ -19,7 +19,7 @@ class APIManager:
                 "engine": "google_jobs",
                 "q": query,
                 "location": location,
-                "api_key": self.apikey,
+                "api_key": self.api_key,
                 "hl": "en",
                 "gl": "ca",
             }
