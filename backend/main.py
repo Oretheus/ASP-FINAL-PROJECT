@@ -29,7 +29,7 @@ app.include_router(test_router, prefix="/v1/test", tags=["test"])
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5174",
+        "http://localhost:5173",
         "https://asp-final-project.onrender.com/",
     ],
     allow_credentials=True,
