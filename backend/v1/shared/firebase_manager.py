@@ -125,17 +125,6 @@ class FirebaseManager:
 
         return None
 
-    def update_user_apikey(self, user_id: str, apikey: str) -> dict:
-        """
-        Update a user's API key.
-        """
-        user_data = self.get_data("users", user_id)
-        if "error" in user_data:
-            return user_data
-
-        user_data["serp_api_key"] = apikey
-        return self.store_data("users", user_id, user_data)
-    
     # ---------------------
     # Search Functions
     # --------------------
