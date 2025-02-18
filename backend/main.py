@@ -28,7 +28,7 @@ app.include_router(test_router, prefix="/v1/test", tags=["test"])
 # Enable CORS (important if frontend calls the API)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://asp-final-project.onrender.com/"],  
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
