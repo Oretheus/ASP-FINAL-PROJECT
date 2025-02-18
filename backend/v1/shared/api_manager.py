@@ -1,7 +1,13 @@
 import requests
 
 class APIManager:
-    def fetch_jobs(self, apikey, query, location, next_page_token=None):
+    def __init__(self):
+        # Retrieve API key from render env secrets variable
+        self.api_key = os.getenv("SERP_API_KEY")
+        if not self.api_key:
+            raise ValueError("Missing SERP_API_KEY in Render env variable.")
+
+    def fetch_jobs(self, query, location, next_page_token=None):
         """
         Fetch job listings from SerpApi - Google Jobs Api
         """
@@ -12,7 +18,7 @@ class APIManager:
                 "engine": "google_jobs",
                 "q": query,
                 "location": location,
-                "api_key": apikey,
+                "api_key": self.apikey,
                 "hl": "en",
                 "gl": "ca",
             }

@@ -13,14 +13,9 @@ class SearchManager:
         user_data = self.firebase_manager.get_data("users", user_id)
         if not user_data:
             raise HTTPException(status_code=404, detail="User not found")
-        
-        apikey = user_data.get("serp_api_key")
-        if not apikey:
-            raise HTTPException(status_code=400, detail="User's API key is missing.")
 
         # Fetch the first page of results
         result = self.api_manager.fetch_jobs(
-            apikey=apikey,
             query=query,
             location=location,
         )
@@ -74,14 +69,9 @@ class SearchManager:
         user_data = self.firebase_manager.get_data("users", user_id)
         if not user_data:
             raise HTTPException(status_code=404, detail="User not found")
-        
-        apikey = user_data.get("serp_api_key")
-        if not apikey:
-            raise HTTPException(status_code=400, detail="User's API key is missing.")
 
         # Fetch next page of results
         result = self.api_manager.fetch_jobs(
-            apikey=apikey,
             query=search_data["query"],
             location=search_data["location"],
             next_page_token=next_page_token,
