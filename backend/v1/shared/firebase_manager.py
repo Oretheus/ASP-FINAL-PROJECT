@@ -182,10 +182,10 @@ class FirebaseManager:
         """Update an application status"""
         return {"message": f"Application status updated to {new_status}"}
 
-    def get_application(self, application_id: str) -> dict:
+    def get_application_status(self, application_id: str) -> dict:
         """Get an application details"""
         return application_doc
 
-    def view_user_applications(self, user_id: str) -> list:
+    def get_user_applications(self, user_id: str) -> list:
         """Get all applications submitted by a user"""
         return user_applications
