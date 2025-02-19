@@ -202,6 +202,9 @@ class FirebaseManager:
         application_doc = self.get_data("applications", application_id)
         timestamp = datetime.now(timezone.utc).isoformat()
 
+        if not application_doc:
+            return {"error": f"No document found for application_id: {application_id}"}
+            
         # Append new status update to history
         application_doc["history"].append({
             "timestamp": timestamp,
