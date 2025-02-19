@@ -199,12 +199,13 @@ class FirebaseManager:
     
     def update_application_status(self, application_id: str, new_status: str, comments: str) -> dict:
         """Update an application status"""
-        application_doc = self.get_data("applications", application_id)
+        try:
+            application_doc = self.get_data("applications", application_id)
+        except Exemption as e:
+            return {'error:', e}
+
         timestamp = datetime.now(timezone.utc).isoformat()
 
-        if not application_doc:
-            return {"error": f"No document found for application_id: {application_id}"}
-            
         # Append new status update to history
         application_doc["history"].append({
             "timestamp": timestamp,
@@ -227,5 +228,5 @@ class FirebaseManager:
     def get_user_applications(self, user_id: str) -> list:
         """Get all applications submitted by a user"""
         applications_found = self.db.collection("applications").where("user_id", "==", user_id).stream()
-        user_applications = [application.to_dict() for appplication in applications_found]
+        user_applications = [application.to_dict() for application in applications_found]
         return user_applications
