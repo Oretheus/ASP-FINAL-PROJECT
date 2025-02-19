@@ -197,7 +197,7 @@ class FirebaseManager:
         try:
             application_doc = await self.get_data("applications", application_id)
         except Exception as e:
-            return {'error:', e}
+            return {'error': f"{e}"}
 
         timestamp = datetime.now(timezone.utc).isoformat()
 
