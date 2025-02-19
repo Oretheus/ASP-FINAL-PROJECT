@@ -8,7 +8,7 @@ class APIManager:
         if not self.api_key:
             raise ValueError("Missing SERP_API_KEY in Render env variable.")
 
-    def fetch_jobs(self, query, location, next_page_token=None):
+    async def fetch_jobs(self, query, location, next_page_token=None):
         """
         Fetch job listings from SerpApi - Google Jobs Api
         """

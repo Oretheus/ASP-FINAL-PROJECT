@@ -6,16 +6,16 @@ class SearchManager:
         self.firebase_manager = firebase_manager
         self.api_manager = api_manager
 
-    def start_search(self, user_id: str, query: str, location: str):
+    async def start_search(self, user_id: str, query: str, location: str):
         """
         Perform the initial job search.
         """
-        user_data = self.firebase_manager.get_data("users", user_id)
+        user_data = await self.firebase_manager.get_data("users", user_id)
         if not user_data:
             raise HTTPException(status_code=404, detail="User not found")
 
         # Fetch the first page of results
-        result = self.api_manager.fetch_jobs(
+        result = await self.api_manager.fetch_jobs(
             query=query,
             location=location,
         )
@@ -35,11 +35,11 @@ class SearchManager:
             job_id = job.get('job_id')
             if not job_id:
                 raise HTTPException(status_code=500, detail="Missing job_id in result data.")
-            self.firebase_manager.store_job(job_id, job)
+            await self.firebase_manager.store_job(job_id, job)
             job_ids.append(job_id)
 
         # Log search and save next_page_token
-        search_id = self.firebase_manager.store_user_search(
+        search_id = await self.firebase_manager.store_user_search(
             user_id=user_id,
             query=query,
             location=location,
@@ -54,11 +54,11 @@ class SearchManager:
             "next_page_token": next_page_token,
         }
 
-    def paginate_search(self, user_id: str, search_id: str):
+    async def paginate_search(self, user_id: str, search_id: str):
         """
         Handle pagination for an existing search.
         """
-        search_data = self.firebase_manager.get_data("user_searches", search_id)
+        search_data = await self.firebase_manager.get_data("user_searches", search_id)
         if not search_data:
             raise HTTPException(status_code=404, detail="Search ID not found")
 
@@ -66,12 +66,12 @@ class SearchManager:
         if not next_page_token:
             raise HTTPException(status_code=400, detail="No more results available")
 
-        user_data = self.firebase_manager.get_data("users", user_id)
+        user_data = await self.firebase_manager.get_data("users", user_id)
         if not user_data:
             raise HTTPException(status_code=404, detail="User not found")
 
         # Fetch next page of results
-        result = self.api_manager.fetch_jobs(
+        result = await self.api_manager.fetch_jobs(
             query=search_data["query"],
             location=search_data["location"],
             next_page_token=next_page_token,
@@ -87,14 +87,14 @@ class SearchManager:
             job_id = job.get('job_id')
             if not job_id:
                 raise HTTPException(status_code=500, detail="Missing job_id in result data.")
-            self.firebase_manager.store_job(job_id, job)
+            await self.firebase_manager.store_job(job_id, job)
             job_ids.append(job_id)
 
         # Update search record with new job_ids
         search_data["job_ids"].extend(job_ids)
         new_token = result.get("next_page_token")
         search_data["next_page_token"] = new_token
-        self.firebase_manager.store_data("user_searches", search_id, search_data)
+        await self.firebase_manager.store_data("user_searches", search_id, search_data)
 
         return {
             "message": "Pagination results retrieved successfully.",

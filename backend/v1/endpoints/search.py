@@ -26,10 +26,10 @@ async def search_jobs(search_request: JobSearchRequest, user: dict = Depends(Tok
 
     if search_request.search_id:
         # Handle pagination
-        return search_manager.paginate_search(user_id, search_request.search_id)
+        return await search_manager.paginate_search(user_id, search_request.search_id)
     else:
         # Handle initial search
-        return search_manager.start_search(
+        return await search_manager.start_search(
             user_id,
             search_request.query,
             search_request.location,
@@ -44,7 +44,7 @@ async def get_job_details(job_id: str, user: dict = Depends(TokenManager.get_cur
     RBACManager.require_role(user, ["user", "admin"])
 
     # Fetch job from Firebase
-    job_data = firebase_manager.fetch_job(job_id)
+    job_data = await firebase_manager.fetch_job(job_id)
     if "error" in job_data:
         raise HTTPException(status_code=404, detail=job_data["error"])
 
