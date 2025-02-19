@@ -201,7 +201,7 @@ class FirebaseManager:
         """Update an application status"""
         try:
             application_doc = self.get_data("applications", application_id)
-        except Exemption as e:
+        except Exception as e:
             return {'error:', e}
 
         timestamp = datetime.now(timezone.utc).isoformat()
