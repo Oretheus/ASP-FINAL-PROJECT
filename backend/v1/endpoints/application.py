@@ -15,7 +15,7 @@ async def save_application(job_id: str, user: dict = Depends(TokenManager.get_cu
     return firebase_manager.save_application(user_id, job_id)
 
 # Update application status
-@router.put("status/{application_id}")
+@router.put("/status/{application_id}")
 async def update_application_status(application_id: str, new_status: str, comments: str, user: dict = Depends(TokenManager.get_current_user)):
     """Update the status of an application"""
     user_id = user.get("user_id")
