@@ -7,9 +7,6 @@ class UserRegister(BaseModel):
     password: str
     role: Optional[str] = "user" # Default role
 
-class AddAPIKey(BaseModel):
-    apikey: str
-
 class JobSearchRequest(BaseModel):
     query: Optional[str] = Field(default=None, description="Search query for jobs")
     location: Optional[str] = Field(default=None, description="Location for the search")
