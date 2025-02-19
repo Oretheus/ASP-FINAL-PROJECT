@@ -59,12 +59,12 @@ class FirebaseManager:
     # --------------------
     # CRUD Functions
     # --------------------
-    async def async_store_data(self, collection: str, document_id: str, data: dict) -> dict:
+    async def store_data(self, collection: str, document_id: str, data: dict) -> dict:
         """
         Store or update a document.
         """
-        loop = asyncio.get_event_loop()
         try:
+            loop = asyncio.get_event_loop()
             await loop.run_in_executor(
                 None,
                 lambda: self.db.collection(collection).document(document_id).set(data)
@@ -73,7 +73,7 @@ class FirebaseManager:
         except Exception as e:
             return {"error": f"FirebaseManager.store_data: {e}"}
 
-    async def async_get_data(self, collection: str, document_id: str) -> dict:
+    async def get_data(self, collection: str, document_id: str) -> dict:
         """
         Retrieve a document asynchronously from Firebase.
         """
@@ -94,7 +94,7 @@ class FirebaseManager:
     # --------------------
     # User Functions
     # --------------------
-    async def async_get_user_data(self, collection: str, email: str) -> Optional[dict]:
+    async def get_user_data(self, collection: str, email: str) -> Optional[dict]:
         """
         Fetch a user by email.
         """
@@ -127,7 +127,7 @@ class FirebaseManager:
     # ---------------------
     # Search Functions
     # --------------------
-    async def async_store_user_search(self, user_id: str, query: str, location: str, job_ids: list, next_page_token: str) -> dict:
+    async def store_user_search(self, user_id: str, query: str, location: str, job_ids: list, next_page_token: str) -> dict:
         """
         Log user's search in the 'user_searches' collection.
         """
@@ -141,25 +141,25 @@ class FirebaseManager:
             "job_ids": job_ids,
             "next_page_token": next_page_token,
         }
-        await self.async_store_data("user_searches", search_id, search_data)
+        await self.store_data("user_searches", search_id, search_data)
         return search_id
 
     # --------------------
     # Job Functions
     # --------------------
-    async def async_store_job(self, job_id: str, job_data: dict) -> dict:
+    async def store_job(self, job_id: str, job_data: dict) -> dict:
         """
         Store a job in the 'jobs' collection.
         """
-        return await self.async_store_data("jobs", job_id, job_data)
+        return await self.store_data("jobs", job_id, job_data)
 
-    async def async_fetch_job(self, job_id: str) -> dict:
+    async def fetch_job(self, job_id: str) -> dict:
         """
         Fetch a specific job by ID.
         """
-        return await self.async_get_data("jobs", job_id)
+        return await self.get_data("jobs", job_id)
 
-    async def async_fetch_jobs_for_search(self, job_ids: list) -> list:
+    async def fetch_jobs_for_search(self, job_ids: list) -> list:
         """
         Fetch jobs based on a list of job IDs.
         """
@@ -169,7 +169,7 @@ class FirebaseManager:
     # --------------------
     # Application Functions
     # --------------------
-    async def async_save_application(self, user_id: str, job_id:str) -> dict:
+    async def save_application(self, user_id: str, job_id:str) -> dict:
         """Save application."""
         application_id = str(uuid.uuid4())
         timestamp = datetime.now(timezone.utc).isoformat()
@@ -189,13 +189,13 @@ class FirebaseManager:
             ]
         }
 
-        await self.async_store_data("applications", application_id, application_data)
+        await self.store_data("applications", application_id, application_data)
         return {"message": "Application saved successfully", "application_id": application_id}
     
-    async def async_update_application_status(self, application_id: str, new_status: str, comments: str) -> dict:
+    async def update_application_status(self, application_id: str, new_status: str, comments: str) -> dict:
         """Update an application status"""
         try:
-            application_doc = await self.async_get_data("applications", application_id)
+            application_doc = await self.get_data("applications", application_id)
         except Exception as e:
             return {'error:', e}
 
@@ -212,15 +212,15 @@ class FirebaseManager:
         application_doc['timestamp'] = timestamp
         application_doc["status"] = new_status
 
-        await self.async_store_data("applications", application_id, application_doc)
+        await self.store_data("applications", application_id, application_doc)
         return {"message": f"Application status updated to {new_status}"}
 
-    async def async_get_application_status(self, application_id: str) -> dict:
+    async def get_application_status(self, application_id: str) -> dict:
         """Get an application status"""
-        application_doc = await self.async_get_data("applications", application_id)
+        application_doc = await self.get_data("applications", application_id)
         return application_doc
 
-    async def async_get_user_applications(self, user_id: str) -> list:
+    async def get_user_applications(self, user_id: str) -> list:
         """Get all applications submitted by a user"""
         try:
             loop = asyncio.get_running_loop()
