@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.v1.endpoints.users import router as users_router
 from backend.v1.endpoints.search import router as search_router
 from backend.v1.endpoints.test_routes import router as test_router
+from backend.v1.endpoints.application import router as application_router
 
 # Initialize the FastAPI app
 app = FastAPI(
@@ -24,6 +25,7 @@ app.mount("/static", StaticFiles(directory="backend/static"), name="static")
 app.include_router(users_router, prefix="/v1/user", tags=["users"])
 app.include_router(search_router, prefix="/v1/search", tags=["search"])
 app.include_router(test_router, prefix="/v1/test", tags=["test"])
+app.include_router(application_router, prefix="/v1/application", tags=["application"])
 
 # Enable CORS (important if frontend calls the API)
 app.add_middleware(
