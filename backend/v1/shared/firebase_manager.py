@@ -176,16 +176,53 @@ class FirebaseManager:
     # --------------------
     def save_application(self, user_id: str, job_id:str) -> dict:
         """Save application."""
+        application_id = str(uuid.uuid4())
+        timestamp = datetime.now(timezone.utc).isoformat()
+
+        application_data = {
+            "application_id": application_id,
+            "user_id": user_id,
+            "job_id": job_id,
+            "timestamp": timestamp,
+            "status": "Saved",
+            "history": [
+                {
+                    "timestamp": timestamp,
+                    "status": "Saved",
+                    "comments": "Saved job listing"
+                }
+            ]
+        }
+
+        self.store_data("applications", application_id, application_data)
         return {"message": "Application saved successfully", "application_id": application_id}
     
     def update_application_status(self, application_id: str, new_status: str, comments: str) -> dict:
         """Update an application status"""
+        application_doc = self.get_data("applications", application_id)
+        timestamp = datetime.now(timezone.utc).isoformat()
+
+        # Append new status update to history
+        application_doc["history"].append({
+            "timestamp": timestamp,
+            "status": new_status,
+            "comments": comments
+        })
+
+        # Update current timestamp and status
+        application_doc['timestamp'] = timestamp
+        application_doc["status"] = new_status
+
+        self.store_data("applications", application_id, application_doc)
         return {"message": f"Application status updated to {new_status}"}
 
     def get_application_status(self, application_id: str) -> dict:
-        """Get an application details"""
+        """Get an application status"""
+        application_doc = self.get_data("applications", application_id)
         return application_doc
 
     def get_user_applications(self, user_id: str) -> list:
         """Get all applications submitted by a user"""
+        applications_found = self.db.collection("applications").where("user_id", "==", user_id).stream()
+        user_applications = [application.to_dict() for appplication in applications_found]
         return user_applications
