@@ -12,7 +12,7 @@ async def save_application(job_id: str, user: dict = Depends(TokenManager.get_cu
     user_id = user.get("user_id")
     if not user_id:
         raise HTTPException(status_code=403, detail="Unauthorized user.")
-    return firebase_manager.save_application(user_id, job_id)
+    return await firebase_manager.save_application(user_id, job_id)
 
 # Update application status
 @router.put("/status/{application_id}")
@@ -21,7 +21,7 @@ async def update_application_status(application_id: str, new_status: str, commen
     user_id = user.get("user_id")
     if not user_id:
         raise HTTPException(status_code=403, detail="Unauthorized user.")
-    return firebase_manager.update_application_status(application_id, new_status, comments)
+    return await firebase_manager.update_application_status(application_id, new_status, comments)
 
 # Get application status
 @router.get("/status/{application_id}")
@@ -30,7 +30,7 @@ async def get_application_status(application_id: str, user: dict = Depends(Token
     user_id = user.get("user_id")
     if not user_id:
         raise HTTPException(status_code=403, detail="Unauthorized user.")
-    return firebase_manager.get_application_status(application_id)
+    return await firebase_manager.get_application_status(application_id)
 
 # Retrieve all applications for a user
 @router.get("/user/{user_id}")
@@ -39,4 +39,4 @@ async def get_user_applications(user_id: str, user: dict = Depends(TokenManager.
     user_id = user.get("user_id")
     if not user_id:
         raise HTTPException(status_code=403, detail="Unauthorized user.")
-    return firebase_manager.get_user_applications(user_id)
+    return await firebase_manager.get_user_applications(user_id)
