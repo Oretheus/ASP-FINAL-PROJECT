@@ -38,7 +38,7 @@ async def register_user(user: UserRegister):
     """
     Register new user.
     """
-    return user_manager.register(
+    return await user_manager.register(
         username=user.username, 
         email=user.email, 
         password=user.password,
@@ -50,4 +50,4 @@ async def login_user(username: str = Form(...), password: str = Form(...)):
     """
     Login and return a token.
     """
-    return user_manager.login(username=username, password=password)
+    return await user_manager.login(username=username, password=password)

@@ -21,7 +21,7 @@ class UserManager:
             return None
         return user_data
 
-    def register(self, username: str, email: str, password: str, role: str = "user"):
+    async def register(self, username: str, email: str, password: str, role: str = "user"):
         """
         Register a new user.
         """
@@ -38,21 +38,21 @@ class UserManager:
             "date_joined": datetime.now(timezone.utc),
         }
 
-        result = self.firebase_manager.store_data("users", user_id, user_data)
+        result = await self.firebase_manager.store_data("users", user_id, user_data)
         if "error" in result:
             raise HTTPException(status_code=500, detail=result["error"])
         return {"message": "User registered successfully", "user_id": user_id}
 
-    def login(self, username: str, password: str):
+    async def login(self, username: str, password: str):
         """
         Authenticate a user.
         """
         # Identify whether username is an email or username
         if "@" in username:
             # Search by email
-            user_data = self.firebase_manager.get_user_data("users", username)
+            user_data = await self.firebase_manager.get_user_data("users", username)
         else:
-            # Search by username
+            # TODO: Search by username -> update to async
             user_docs = self.firebase_manager.db.collection("users").where("username", "==", username).stream()
             user_data = None
             for doc in user_docs:
@@ -77,17 +77,3 @@ class UserManager:
             "access_token": access_token,
             "token_type": "bearer"
         }
-
-    def add_apikey(self, user_id: str, apikey: str):
-        """
-        Add or update user's SERP API key.
-        """
-        user_data = self.firebase_manager.get_data("users", user_id)
-        if not user_data:
-            raise HTTPException(status_code=404, detail="User not found")
-
-        user_data["serp_api_key"] = apikey
-        result = self.firebase_manager.store_data("users", user_id, user_data)
-        if "error" in result:
-            raise HTTPException(status_code=500, detail=result["error"])
-        return {"message": "API key added successfully"}
