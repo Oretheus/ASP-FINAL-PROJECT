@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Form
 from backend.v1.shared.user_manager import UserManager
 from backend.v1.shared.firebase_manager import FirebaseManager
-from backend.v1.shared.models import UserRegister, AddAPIKey
+from backend.v1.shared.models import UserRegister
 from backend.v1.shared.token_manager import TokenManager
 from backend.v1.shared.rbac_manager import RBACManager
 import asyncio
