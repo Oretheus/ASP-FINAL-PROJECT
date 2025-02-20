@@ -15,7 +15,7 @@ async def save_application(job_id: str, user: dict = Depends(TokenManager.get_cu
     return await firebase_manager.save_application(user_id, job_id)
 
 # Update application status
-@router.put("/status/{application_id}")
+@router.put("/update/{application_id}")
 async def update_application_status(application_id: str, new_status: str, comments: str, user: dict = Depends(TokenManager.get_current_user)):
     """Update the status of an application"""
     user_id = user.get("user_id")
@@ -24,8 +24,8 @@ async def update_application_status(application_id: str, new_status: str, commen
     return await firebase_manager.update_application_status(application_id, new_status, comments)
 
 # Get application status
-@router.get("/status/{application_id}")
-async def get_application_status(application_id: str, user: dict = Depends(TokenManager.get_current_user)):
+@router.get("/details/{application_id}")
+async def view_application_details(application_id: str, user: dict = Depends(TokenManager.get_current_user)):
     """Get the status of an application."""
     user_id = user.get("user_id")
     if not user_id:
@@ -34,7 +34,7 @@ async def get_application_status(application_id: str, user: dict = Depends(Token
 
 # Retrieve all applications for a user
 @router.get("/user/{user_id}")
-async def get_user_applications(user_id: str, user: dict = Depends(TokenManager.get_current_user)):
+async def view_user_applications(user_id: str, user: dict = Depends(TokenManager.get_current_user)):
     """Retrieve all applications for a user."""
     user_id = user.get("user_id")
     if not user_id:
