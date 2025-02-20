@@ -232,6 +232,14 @@ class FirebaseManager:
         application_doc = await self.get_data("applications", application_id)
         return application_doc
 
+    async def delete_application(self, application_id: str) -> dict:
+        """Delete saved application"""
+        try:
+            await self.delete_doc("applications", application_id)
+            return {"message": f"Successfully deleted application {application_id}"}
+        except Exception as e:
+            return {"error": f"e"}
+
     async def get_user_applications(self, user_id: str) -> list:
         """Get all applications submitted by a user"""
         try:

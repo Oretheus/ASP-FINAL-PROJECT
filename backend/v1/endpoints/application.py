@@ -32,6 +32,15 @@ async def view_application_details(application_id: str, user: dict = Depends(Tok
         raise HTTPException(status_code=403, detail="Unauthorized user.")
     return await firebase_manager.get_application_status(application_id)
 
+# Delete application
+@router.get("/delete/{application_id}")
+async def delete_application(application_id: str, user: dict = Depends(TokenManager.get_current_user)):
+    """Delete application"""
+    user_id = user.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=403, detail="Unauthorized user.")
+    return await firebase_manager.delete_application(application_id)
+
 # Retrieve all applications for a user
 @router.get("/user/{user_id}")
 async def view_user_applications(user_id: str, user: dict = Depends(TokenManager.get_current_user)):
