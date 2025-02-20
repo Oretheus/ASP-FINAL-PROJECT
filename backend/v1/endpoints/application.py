@@ -7,7 +7,7 @@ firebase_manager = FirebaseManager()
 
 # Save application
 @router.post("/save/{job_id}")
-async def save_application(job_id: str, user: dict = Depends(TokenManager.get_current_user)):
+async def save_job_listing(job_id: str, user: dict = Depends(TokenManager.get_current_user)):
     """Save a job listing"""
     user_id = user.get("user_id")
     if not user_id:
