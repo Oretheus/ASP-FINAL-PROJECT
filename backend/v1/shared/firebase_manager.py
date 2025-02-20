@@ -91,6 +91,18 @@ class FirebaseManager:
         except Exception as e:
             return {"error": f"General error: {str(e)}"}
 
+    async def delete_doc(self, collection: str, document_id: str) -> dict:
+        """
+        Delete document 
+        """
+        try:
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, 
+                lambda: self.db.collection(collection).document(document_id).delete()
+            )
+        except Exception as e:
+            return {"error": f"FirebaseManager.delete_doc: {e}"}
+
     # --------------------
     # User Functions
     # --------------------
