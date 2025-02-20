@@ -26,11 +26,16 @@ async def update_application_status(application_id: str, new_status: str, commen
 # Get application status
 @router.get("/details/{application_id}")
 async def view_application_details(application_id: str, user: dict = Depends(TokenManager.get_current_user)):
-    """Get the status of an application."""
+    """Get application details."""
     user_id = user.get("user_id")
     if not user_id:
         raise HTTPException(status_code=403, detail="Unauthorized user.")
-    return await firebase_manager.get_application_status(application_id)
+    
+    application_doc, job_doc = await firebase_manager.get_application_details(application_id)
+    return {
+        "application": application_doc,
+        "job": job_doc
+    }
 
 # Delete application
 @router.get("/delete/{application_id}")

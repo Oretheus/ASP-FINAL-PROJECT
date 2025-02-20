@@ -227,10 +227,12 @@ class FirebaseManager:
         await self.store_data("applications", application_id, application_doc)
         return {"message": f"Application status updated to {new_status}"}
 
-    async def get_application_status(self, application_id: str) -> dict:
-        """Get an application status"""
+    async def get_application_details(self, application_id: str) -> dict:
+        """Return application and job documents"""
         application_doc = await self.get_data("applications", application_id)
-        return application_doc
+        job_id = application_doc['job_id']
+        job_doc = await self.get_data("jobs", job_id)
+        return application_doc, job_doc
 
     async def delete_application(self, application_id: str) -> dict:
         """Delete saved application"""
