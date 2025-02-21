@@ -216,7 +216,7 @@ class FirebaseManager:
         try:
             application_doc = await self.get_data("applications", application_id)
         except Exception as e:
-            return {'error': f"{e}"}
+            return {'error': e}
 
         timestamp = datetime.now(timezone.utc).isoformat()
 
@@ -254,7 +254,7 @@ class FirebaseManager:
             await self.delete_doc("applications", application_id)
             return {"message": f"Successfully deleted application {application_id}"}
         except Exception as e:
-            return {"error": f"e"}
+            return {"error": e}
 
     async def get_user_applications(self, user_id: str) -> list:
         """Get all applications submitted by a user"""
