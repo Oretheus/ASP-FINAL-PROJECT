@@ -202,7 +202,14 @@ class FirebaseManager:
         }
 
         await self.store_data("applications", application_id, application_data)
-        return {"message": "Application saved successfully", "application_id": application_id}
+
+        # Update user points based on status
+        results = await self._calculate_user_points(user_id, 'Saved')
+        return {
+            "message": "Application saved successfully", 
+            "application_id": application_id,
+            "points": results
+        }
     
     async def update_application_status(self, user_id: str, application_id: str, new_status: str, comments: str) -> dict:
         """Update an application status"""
@@ -225,7 +232,14 @@ class FirebaseManager:
         application_doc["status"] = new_status
 
         await self.store_data("applications", application_id, application_doc)
-        return {"message": f"Application status updated to {new_status}"}
+
+        # Update user points based on status
+        results = await self._calculate_user_points(user_id, new_status)
+        return {
+            "message": f"Application status updated to {new_status}",
+            "comments": comments,
+            "points": results
+        }
 
     async def get_application_details(self, user_id: str, application_id: str) -> dict:
         """Return application and job documents"""
@@ -256,3 +270,50 @@ class FirebaseManager:
             return {"error": f"Firebase error: {str(e)}"}
         except Exception as e:
             return {"error": f"General error: {str(e)}"}
+    
+    # --------------------
+    # Gamification Functions
+    # --------------------
+    async def _calculate_user_points(self, user_id: str, new_status: str) -> dict:
+        """ Private function to calculate and update user points based on application status"""
+        loop = asyncio.get_event_loop()
+
+        # Define values for set of statuses
+        status_points = {
+            "Saved": 1,
+            "Applied": 5,
+            "Under Review": 10,
+            "Interview Scheduled": 15,
+            "Offer Received": 20,
+            "Rejected": 0,  # No change
+            "Withdrawn": -5,  # Penalize user
+        }
+
+        # Ensure valid status
+        if new_status not in status_points:
+            return {"error": f"Invalid status: {new_status}"}
+
+        # Retrieve user data
+        user_doc = await self.get_data("users", user_id)
+        if "error" in user_doc:
+            return {"error": "User not found"}
+
+        # Get current points
+        current_points = user_doc.get("points", 0) # Default 0
+
+        # Calculate new points
+        points_to_add = status_points[new_status]
+        new_total_points = max(0, current_points + points_to_add)  # No negative total points
+
+        # Update user points
+        await loop.run_in_executor(
+            None,
+            lambda: self.db.collection("users").document(user_id).update({"points": new_total_points})
+        )
+
+        return {
+            "message": f"Points updated for User {user_id}",
+            "previous_points": current_points,
+            "received_points": points_to_add, 
+            "total_points": new_total_points
+        }
