@@ -280,11 +280,11 @@ class FirebaseManager:
 
         # Define values for set of statuses
         status_points = {
-            "Saved": 1,
+            "Saved": 1, # Auto set
             "Applied": 5,
             "Under Review": 10,
             "Interview Scheduled": 15,
-            "Offer Received": 20,
+            "Offer Received": 1000000, # Winner
             "Rejected": 0,  # No change
             "Withdrawn": -5,  # Penalize user
         }
