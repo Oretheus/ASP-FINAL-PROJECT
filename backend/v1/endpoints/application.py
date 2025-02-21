@@ -21,7 +21,7 @@ async def update_application_status(application_id: str, new_status: str, commen
     user_id = user.get("user_id")
     if not user_id:
         raise HTTPException(status_code=403, detail="Unauthorized user.")
-    return await firebase_manager.update_application_status(application_id, new_status, comments)
+    return await firebase_manager.update_application_status(user_id, application_id, new_status, comments)
 
 # Get application status
 @router.get("/details/{application_id}")
@@ -31,7 +31,7 @@ async def view_application_details(application_id: str, user: dict = Depends(Tok
     if not user_id:
         raise HTTPException(status_code=403, detail="Unauthorized user.")
     
-    application_doc, job_doc = await firebase_manager.get_application_details(application_id)
+    application_doc, job_doc = await firebase_manager.get_application_details(user_id, application_id)
     return {
         "application": application_doc,
         "job": job_doc
@@ -44,7 +44,7 @@ async def delete_application(application_id: str, user: dict = Depends(TokenMana
     user_id = user.get("user_id")
     if not user_id:
         raise HTTPException(status_code=403, detail="Unauthorized user.")
-    return await firebase_manager.delete_application(application_id)
+    return await firebase_manager.delete_application(user_id, application_id)
 
 # Retrieve all applications for a user
 @router.get("/user/{user_id}")
