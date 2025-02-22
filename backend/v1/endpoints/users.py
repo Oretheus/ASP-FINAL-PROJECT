@@ -52,7 +52,7 @@ async def login_user(username: str = Form(...), password: str = Form(...)):
     """
     return await user_manager.login(username=username, password=password)
 
-@router.post("/points")
+@router.get("/points")
 async def user_points(user: dict = Depends(TokenManager.get_current_user)):
     """
     Return user points
