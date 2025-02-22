@@ -136,6 +136,26 @@ class FirebaseManager:
         except Exception as e:
             return {"error": f"General error: {str(e)}"} 
 
+    async def get_user_points(self, user_id: str) -> dict:
+        """
+        Get user points
+        """
+        try:
+            loop = asyncio.get_event_loop()
+            user_doc = await loop.run_in_executor(
+                None,
+                lambda: self.db.collection('users').document(user_id).get()
+            )
+            user_data = user_doc.to_dict()
+            return {
+                "user_id": user_id,
+                "current_points": user_data['points']
+            }
+        except exceptions.FirebaseError as e:
+            return {"error": f"Firebase error: {str(e)}"}
+        except Exception as e:
+            return {"error": f"firebase_manager.get_user_points: {str(e)}"} 
+        
     # ---------------------
     # Search Functions
     # --------------------

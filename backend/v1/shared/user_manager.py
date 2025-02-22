@@ -77,3 +77,11 @@ class UserManager:
             "access_token": access_token,
             "token_type": "bearer"
         }
+    
+    async def get_points(self, user_id: str):
+        try:
+            return await self.firebase_manager.get_user_points(user_id)
+        except Exception as e:
+            return {
+                "error": f"user_manager.get_points {str(e)}"
+            }

@@ -51,3 +51,13 @@ async def login_user(username: str = Form(...), password: str = Form(...)):
     Login and return a token.
     """
     return await user_manager.login(username=username, password=password)
+
+@router.post("/points")
+async def user_points(user: dict = Depends(TokenManager.get_current_user)):
+    """
+    Return user points
+    """
+    user_id = user.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=403, detail="Unauthorized user.")
+    return await user_manager.get_points(user_id)
