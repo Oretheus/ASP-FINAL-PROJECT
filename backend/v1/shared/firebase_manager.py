@@ -71,7 +71,7 @@ class FirebaseManager:
             )
             return {"message": "Data successfully stored", "document_id": document_id}
         except Exception as e:
-            return {"error": f"FirebaseManager.store_data: {e}"}
+            return {"error": f"FirebaseManager.store_data: {str(e)}"}
 
     async def get_data(self, collection: str, document_id: str) -> dict:
         """
@@ -101,7 +101,7 @@ class FirebaseManager:
                 lambda: self.db.collection(collection).document(document_id).delete()
             )
         except Exception as e:
-            return {"error": f"FirebaseManager.delete_doc: {e}"}
+            return {"error": f"FirebaseManager.delete_doc: {str(e)}"}
 
     # --------------------
     # User Functions
@@ -216,7 +216,7 @@ class FirebaseManager:
         try:
             application_doc = await self.get_data("applications", application_id)
         except Exception as e:
-            return {'error': e}
+            return {'error': f"firebase_manager.update_application_status {e}"}
 
         timestamp = datetime.now(timezone.utc).isoformat()
 
@@ -254,7 +254,7 @@ class FirebaseManager:
             await self.delete_doc("applications", application_id)
             return {"message": f"Successfully deleted application {application_id}"}
         except Exception as e:
-            return {"error": e}
+            return {"error": f"firebase_manager.delete_application {str(e)}"}
 
     async def get_user_applications(self, user_id: str) -> list:
         """Get all applications submitted by a user"""
@@ -269,7 +269,7 @@ class FirebaseManager:
         except exceptions.FirebaseError as e:
             return {"error": f"Firebase error: {str(e)}"}
         except Exception as e:
-            return {"error": f"General error: {str(e)}"}
+            return {"error": f"firebase_manager.get_user_applications: {str(e)}"}
     
     # --------------------
     # Gamification Functions
