@@ -146,11 +146,16 @@ class FirebaseManager:
                 None,
                 lambda: self.db.collection('users').document(user_id).get()
             )
-            user_data = user_doc.to_dict()
-            return {
-                "user_id": user_id,
-                "current_points": user_data['points']
-            }
+            if user_doc:
+                user_data = user_doc.to_dict()
+                return {
+                    "user_id": user_id,
+                    "current_points": user_data['points']
+                }
+            else:
+                return {
+                    "error": f"FirebaseManager.get_user_points user_doc not found"
+                }
         except exceptions.FirebaseError as e:
             return {"error": f"Firebase error: {str(e)}"}
         except Exception as e:
