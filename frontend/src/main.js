@@ -13,6 +13,7 @@ import '@quasar/extras/material-symbols-rounded/material-symbols-rounded.css'
 import '@quasar/extras/material-symbols-sharp/material-symbols-sharp.css'
 import '@quasar/extras/fontawesome-v6/fontawesome-v6.css'
 
+// Import Quasar css
 import 'quasar/src/css/index.sass'
 
 import App from './App.vue'
