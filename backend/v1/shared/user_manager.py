@@ -75,7 +75,8 @@ class UserManager:
         return {
             "message": "Login successful", 
             "access_token": access_token,
-            "token_type": "bearer"
+            "token_type": "bearer",
+            "user_id": user_data['user_id']
         }
     
     async def get_points(self, user_id: str):
