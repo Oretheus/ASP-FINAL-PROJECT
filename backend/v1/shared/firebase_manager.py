@@ -73,7 +73,7 @@ class FirebaseManager:
         except Exception as e:
             return {"error": f"FirebaseManager.store_data: {str(e)}"}
 
-    async def async_get_data(self, collection: str, document_id: str) -> dict:
+    async def get_data(self, collection: str, document_id: str) -> dict:
         """
         Retrieve a document asynchronously from Firebase.
         """
