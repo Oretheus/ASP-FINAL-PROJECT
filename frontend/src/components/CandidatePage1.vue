@@ -3,7 +3,11 @@
     <q-header
       elevated
       class="q-py-sm"
-      :style="{ background: '#286ea6', height: '56px' }"
+      :style="{
+        background: 'linear-gradient(135deg, #286ea6, #1a4d80)',
+        height: '65px',
+        borderBottom: '2px solid #1a4d80',
+      }"
     >
       <q-toolbar class="q-pa-none">
         <q-avatar size="40px" class="q-ml-md">
@@ -13,7 +17,10 @@
         <q-space />
 
         <q-tabs align="right" class="q-mr-md">
-          <q-route-tab to="/" icon="home" />
+          <q-route-tab to="/">
+            <q-icon name="home" size="30px" />
+          </q-route-tab>
+
           <q-route-tab to="/candidate2" icon="task" />
         </q-tabs>
       </q-toolbar>
@@ -22,25 +29,61 @@
     <q-page-container>
       <q-page class="q-pa-md">
         <div class="row q-gutter-md justify-center">
-          <!-- Points & Streak Card -->
           <q-card class="dashboard-card shadow-3">
-            <q-card-section class="text-center">
-              <q-icon name="emoji_events" size="50px" color="amber" />
-              <div class="text-h6 text-bold q-mt-md">Your Points</div>
-              <div class="text-h6 text-primary q-mt-sm">{{ points }}</div>
-            </q-card-section>
+            <!-- Flex container for both sections -->
+            <div
+              class="q-gutter-md column"
+              style="display: flex; flex-direction: column; align-items: center"
+            >
+              <!-- Points Section -->
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                "
+              >
+                <q-icon name="emoji_events" size="50px" color="amber" />
+                <div class="row q-mt-md">
+                  <div class="text-h6 text-bold" style="margin-right: 8px">
+                    Your Points:
+                  </div>
+                  <div class="text-h6 text-primary">{{ points }}</div>
+                </div>
+              </div>
+
+              <!-- Description Section -->
+              <div>
+                <p class="text-subtitle2">
+                  Points are awarded based on your activity, such as completing
+                  tasks, applying for jobs, and reaching milestones. <br />Keep
+                  earning points to unlock rewards, gain recognition, and stay
+                  motivated in your internship search journey.
+                </p>
+              </div>
+            </div>
           </q-card>
         </div>
         <div class="q-gutter-md flex justify-center" style="width: 100%">
           <q-card
             class="q-pa-md q-mb-xl q-mt-xl"
             style="
-              width: 600px;
+              width: 1000px;
               max-width: 100%;
               box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+              margin-top: 100px;
             "
             bordered
           >
+            <div class="q-mb-lg text-center">
+              <p class="text-h6">Search for Jobs</p>
+              <p class="text-subtitle2">
+                Enter a job title and location to search for available job
+                opportunities. <br />
+                You can use the filters to refine your search and find jobs that
+                match your skills and preferences.
+              </p>
+            </div>
             <div class="q-gutter-md">
               <!-- Job Title Input -->
               <q-input
@@ -48,7 +91,7 @@
                 label="Job Title"
                 outlined
                 dense
-                class="q-mb-sm"
+                class="q-mb-sm search-input"
                 placeholder="Enter job title"
               />
 
@@ -58,7 +101,7 @@
                 label="Location"
                 outlined
                 dense
-                class="q-mb-sm"
+                class="q-mb-sm search-input"
                 placeholder="Enter location"
               />
 
@@ -88,15 +131,23 @@
                   >Job Listings</q-item-label
                 >
               </div>
-              <q-scroll-area style="height: 500px; max-width: 600px">
+              <q-scroll-area style="height: 500px; max-width: 700px">
                 <div v-for="(job, index) in jobs" :key="index">
-                  <q-item>
+                  <q-item clickable>
                     <!-- Main job details -->
+                    <q-avatar square size="50px">
+                      <q-icon
+                        name="account_circle"
+                        size="50px"
+                        :style="{ color: '#3678b3' }"
+                      />
+                    </q-avatar>
+
                     <q-item-section>
-                      <q-item-label class="text-subtitle2">{{
+                      <q-item-label class="q-ml-md text-subtitle2">{{
                         job.job_title
                       }}</q-item-label>
-                      <q-item-label caption
+                      <q-item-label class="q-ml-md" caption
                         >{{ job.company_name }} -
                         {{ job.address_city }}</q-item-label
                       >
@@ -157,15 +208,22 @@
                 <q-item-label class="text-h6 q-mb-lg">Favourites</q-item-label>
               </div>
 
-              <q-scroll-area style="height: 500px; max-width: 600px">
+              <q-scroll-area style="height: 500px; max-width: 700px">
                 <div v-for="(job, index) in favouritesList" :key="index">
-                  <q-item>
+                  <q-item clickable>
+                    <q-avatar square size="50px">
+                      <q-icon
+                        name="account_circle"
+                        size="50px"
+                        :style="{ color: '#3678b3' }"
+                      />
+                    </q-avatar>
                     <q-item-section>
                       <!-- Main job details -->
-                      <q-item-label class="text-subtitle2">{{
+                      <q-item-label class="text-subtitle2 q-ml-md">{{
                         job.job.title
                       }}</q-item-label>
-                      <q-item-label caption>
+                      <q-item-label class="q-ml-md" caption>
                         {{ job.job.company_name }}
                       </q-item-label>
                     </q-item-section>
@@ -179,7 +237,7 @@
                           round
                           color="black"
                           icon="delete"
-                          @click="deleteJob(job.job.application_id)"
+                          @click="deleteJob(job.application.application_id)"
                           class="q-mr-md"
                         />
 
@@ -288,12 +346,12 @@
       </q-page>
     </q-page-container>
   </q-layout>
-  {{ savedJobs }}
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import axios from "axios";
+import _ from "lodash";
 
 const searchQuery = ref("Software developer remote");
 const searchLocation = ref("toronto");
@@ -316,22 +374,14 @@ const decodeBase64Results = (results) => {
   });
 };
 
-//searchJobs
+// Search for jobs based on query and location
 const searchJobs = async () => {
-  const payload = {
-    query: searchQuery.value,
-    location: searchLocation.value,
-  };
-
+  const payload = { query: searchQuery.value, location: searchLocation.value };
   console.log("Payload being sent:", JSON.stringify(payload, null, 2));
 
   try {
     const token = localStorage.getItem("authToken");
-    if (!token) {
-      console.error("Authorization token is missing!");
-      return;
-    }
-    console.log("Stored Token:", token);
+    if (!token) return console.error("Authorization token is missing!");
 
     const response = await axios.post(
       "https://asp-final-project.onrender.com/v1/search/jobs",
@@ -343,41 +393,30 @@ const searchJobs = async () => {
         },
       }
     );
+
     console.log("API Response:", response.data);
 
-    // Check if the message indicates a successful search
     if (
       response.data.message ===
       "Initial Search - Search results retrieved successfully."
     ) {
-      if (response.data.results && response.data.results.length > 0) {
-        console.log("response.data.results:", response.data.results);
+      if (response.data.results?.length) {
         jobIds.value = response.data.results;
-        console.log("jobIds.value:", jobIds.value);
-        // Decode the job results if needed
         const decodedJobs = decodeBase64Results(response.data.results);
-        if (jobIds.value.length === decodedJobs.length) {
-          jobs.value = decodedJobs.map((job, index) => {
-            const jobWithId = {
-              ...job,
-              jobId: jobIds.value[index], // Assign the specific job's ID from jobIds
-            };
-            console.log(`Job at index ${index}:`, jobWithId); // Debugging log to check each job's ID
-            return jobWithId;
-          });
 
+        if (jobIds.value.length === decodedJobs.length) {
+          jobs.value = decodedJobs.map((job, index) => ({
+            ...job,
+            jobId: jobIds.value[index],
+          }));
           console.log("Final Jobs Array:", jobs.value);
         } else {
           console.error("Mismatch in length between jobIds and decodedJobs");
         }
 
         nextPageToken.value = response.data.next_page_token || null;
-        console.log("nextPageToken.value:", nextPageToken.value);
-        const searchId = response.data.search_id || null;
-        if (searchId) {
-          localStorage.setItem("search_id", searchId); // Store search_id
-        }
-        console.log("Jobs retrieved:", jobs.value);
+        if (response.data.search_id)
+          localStorage.setItem("search_id", response.data.search_id);
       } else {
         console.warn("No jobs found for your search.");
       }
@@ -395,49 +434,41 @@ const searchJobs = async () => {
   }
 };
 
-//loadMoreJobs
+// Load more job results using the stored search ID
 const loadMoreJobs = async () => {
   const searchId = localStorage.getItem("search_id");
   const token = localStorage.getItem("authToken");
+  if (!searchId) return console.error("Search ID is missing or expired.");
 
-  if (searchId) {
-    try {
-      const response = await axios.post(
-        "https://asp-final-project.onrender.com/v1/search/jobs",
-        {
-          search_id: searchId,
+  try {
+    const response = await axios.post(
+      "https://asp-final-project.onrender.com/v1/search/jobs",
+      { search_id: searchId },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data.message) {
-        const decodedJobs = decodeBase64Results(response.data.results);
-        jobs.value = [...jobs.value, ...decodedJobs]; //appending
-        console.log(response.data.message);
-        console.log("Additional jobs retrived:", response.data);
-      } else {
-        console.log("No more results.");
       }
-    } catch (error) {
-      console.error("Error loading more jobs:", error);
+    );
+
+    if (response.data.message) {
+      const decodedJobs = decodeBase64Results(response.data.results);
+      jobs.value = [...jobs.value, ...decodedJobs]; // Append new results
+      console.log(response.data.message);
+    } else {
+      console.log("No more results.");
     }
-  } else {
-    console.error("Search ID is missing or expired.");
+  } catch (error) {
+    console.error("Error loading more jobs:", error);
   }
 };
 
-//saveJob
-
+// Save a job to the user's favorites
 const saveJob = async (jobId) => {
   const token = localStorage.getItem("authToken");
 
   try {
-    // Save the job
     const response = await axios.post(
       `https://asp-final-project.onrender.com/v1/application/save/${jobId}`,
       {},
@@ -450,16 +481,13 @@ const saveJob = async (jobId) => {
     );
 
     console.log("Job saved successfully:", response.data);
-
-    // Extract application_id 
     const applicationId = response.data.application_id;
-    if (!applicationId) {
+    if (!applicationId)
       throw new Error("No application_id found in the response");
-    }
-    points.value = 0;
+
     points.value = response.data.points.total_points;
-    // console.log("points.value:", points.value);
-    // Fetch application details using the application_id
+
+    // Fetch saved job details
     const savedJobDetails = await axios.get(
       `https://asp-final-project.onrender.com/v1/application/details/${applicationId}`,
       {
@@ -470,25 +498,32 @@ const saveJob = async (jobId) => {
       }
     );
 
-    // console.log("Application details:", savedJobDetails.data);
     savedJobs.value = savedJobDetails.data;
-    console.log("savedJobs.value:", savedJobs.value);
-    favouritesList.value.push(savedJobs.value);
-    console.log("favouritesList.value:", favouritesList.value);
+
+    // Prevent duplicate entries in favorites
+    if (
+      !_.some(
+        favouritesList.value,
+        (job) => job.job.job_id === savedJobs.value.job.job_id
+      )
+    ) {
+      favouritesList.value.push(savedJobs.value);
+    } else {
+      console.log("Job already exists in favorites");
+    }
   } catch (error) {
     console.error("Error:", error.response?.data || error.message);
     throw error;
   }
 };
 
-//fetchPoints
+// Fetch the user's current points
 const fetchPoints = async () => {
   const token = localStorage.getItem("authToken");
- 
+
   try {
     const response = await axios.get(
       `https://asp-final-project.onrender.com/v1/user/points`,
-
       {
         headers: {
           "Content-Type": "application/json",
@@ -496,22 +531,18 @@ const fetchPoints = async () => {
         },
       }
     );
-    points.value = 0;
+
     points.value = response.data.current_points || 0;
   } catch (error) {
     console.error("Error fetching points:", error);
   }
 };
 
-//fetchAllApplications
+// Fetch all applications for the current user
 const fetchAllApplications = async () => {
-  const token = localStorage.getItem("authToken"); 
-  const userId = localStorage.getItem("user_id"); // Retrieve the user_id
-
-  if (!userId) {
-    console.error("User ID not found in localStorage.");
-    return;
-  }
+  const token = localStorage.getItem("authToken");
+  const userId = localStorage.getItem("user_id");
+  if (!userId) return console.error("User ID not found in localStorage.");
 
   try {
     const response = await axios.get(
@@ -519,26 +550,63 @@ const fetchAllApplications = async () => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Include auth token for authorization
+          Authorization: `Bearer ${token}`,
         },
       }
     );
 
     console.log("Applications Fetched:", response.data);
-    return response.data; // Return data for further use
+
+    // Fetch details for each saved job
+    for (const application of response.data) {
+      await fetchJobDetails(application.application_id);
+    }
   } catch (error) {
-    console.error("Error fetching applications:", error.response?.data || error.message);
+    console.error(
+      "Error fetching applications:",
+      error.response?.data || error.message
+    );
   }
 };
 
-//getting job details
+// Fetch job details by application ID
+const fetchJobDetails = async (applicationId) => {
+  const token = localStorage.getItem("authToken");
+
+  try {
+    const savedJobDetails = await axios.get(
+      `https://asp-final-project.onrender.com/v1/application/details/${applicationId}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // Prevent duplicate entries in favorites
+    if (
+      !_.some(
+        favouritesList.value,
+        (job) => job.job.job_id === savedJobDetails.data.job.job_id
+      )
+    ) {
+      favouritesList.value.push(savedJobDetails.data);
+    } else {
+      console.log("Job already exists in favorites");
+    }
+  } catch (error) {
+    console.error(
+      "Error fetching job details:",
+      error.response?.data || error.message
+    );
+  }
+};
+
+// Fetch job details using job ID
 const getJobDetails = async (jobId) => {
   const token = localStorage.getItem("authToken");
-  console.log("jobId:", jobId);
-  if (!token) {
-    console.error("Authorization token is missing.");
-    return;
-  }
+  if (!token) return console.error("Authorization token is missing.");
 
   try {
     const response = await axios.get(
@@ -550,8 +618,6 @@ const getJobDetails = async (jobId) => {
         },
       }
     );
-
-    console.log("Job details response:", response.data);
 
     if (response.data) {
       jobDetails.value = response.data;
@@ -567,47 +633,34 @@ const getJobDetails = async (jobId) => {
   }
 };
 
+// Delete a job application and update UI
 const deleteJob = async (applicationId) => {
   const token = localStorage.getItem("authToken");
-  console.log("applicationId:", applicationId);
-  if (!token) {
-    console.error("Authorization token is missing.");
-    return;
-  }
+  if (!token) return console.error("Authorization token is missing.");
 
   try {
-    const response = await axios.get(
+    console.log("Deleting job:", applicationId);
+    await axios.get(
       `https://asp-final-project.onrender.com/v1/application/delete/${applicationId}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    console.log("Job deletion response:", response.data);
+    console.log("Job deleted successfully");
 
-    if (response.data) {
-      console.log("Job deleted successfully:", response.data);
+    // Fetch updated applications
+    const { data: applications } = await axios.get(
+      `https://asp-final-project.onrender.com/v1/application/user/${localStorage.getItem(
+        "user_id"
+      )}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    // Remove deleted job from favorites list
+    const fetchedJobIds = new Set(applications.map((app) => app.job?.job_id));
+    favouritesList.value = favouritesList.value.filter(
+      (job) => job.job?.job_id && fetchedJobIds.has(job.job.job_id) // Check if job and job_id are defined
+    );
 
-      // Fetch application details using the application_id
-      const savedJobDetails = await axios.get(
-        `https://asp-final-project.onrender.com/v1/application/details/${applicationId}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      savedJobs.value = {};
-      savedJobs.value = savedJobDetails.data;
-      console.log("savedJobs.value:", savedJobs.value);
-    } else {
-      console.warn("No response data after deletion.");
-    }
+    console.log("Updated favourites list:", favouritesList.value);
   } catch (error) {
     console.error("Error deleting job:", error.response?.data || error.message);
   }
@@ -617,6 +670,7 @@ onMounted(() => {
   fetchPoints();
   // fetchLeaderboard();
   fetchAllApplications();
+  console.log("favouritesList:", favouritesList);
 });
 </script>
 
@@ -628,6 +682,7 @@ onMounted(() => {
 }
 .my-card {
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
+  margin-top: 100px;
 }
 .bg-light-grey {
   background-color: #f5f5f5 !important;
@@ -647,11 +702,19 @@ onMounted(() => {
 }
 
 /* Leaderboard Card */
-.leaderboard-card {
+/* .leaderboard-card {
   width: 450px;
   max-width: 100%;
   padding: 20px;
   border-radius: 15px;
   background-color: #f8f9fa;
+} */
+.search-input {
+  border-radius: 12px;
+  padding: 10px;
+  transition: 0.3s;
+}
+.search-input:hover {
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
 }
 </style>
