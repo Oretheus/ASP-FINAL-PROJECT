@@ -28,7 +28,7 @@
             borderRadius: '10px',
             background: darkMode
               ? 'linear-gradient(to right, #333, #444)'
-              : 'linear-gradient(to right, #6a11cb, #2575fc)',
+              : 'linear-gradient(135deg, #286ea6, #1a4d80)',
           }"
         >
           <!-- linear-gradient(135deg, #4e54c8, #8f94fb) -->
@@ -105,10 +105,10 @@
                 label="Login"
                 :loading="loading"
                 :style="{
-                  color: 'black',
+                  color: 'white',
                   width: '100%',
                   marginBottom: '10px',
-                  backgroundColor: '#1976d2',
+                  backgroundColor: '#4b88c4',
                   borderRadius: '5px',
                   padding: '10px 20px',
                 }"
@@ -165,8 +165,8 @@ import Register from "@/components/Register.vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 // import { useQuasar } from "quasar";
-const email = ref("yyy@gmail.com");
-const password = ref("password123");
+const email = ref("asd@gmail.com");
+const password = ref("Password123");
 const passwordVisible = ref(false);
 const darkMode = ref(false);
 const errorMessage = ref("");
