@@ -35,7 +35,7 @@
               class="q-gutter-md column"
               style="display: flex; flex-direction: column; align-items: center"
             >
-              <!-- Points Section -->
+              <!-- Emoji and Points Section: Centered -->
               <div
                 style="
                   display: flex;
@@ -124,11 +124,11 @@
 
         <div class="q-gutter-md flex justify-center">
           <!-- Job Listings Card -->
-          <q-card class="my-card q-pa-md q-mx-xl" style="width: 40%">
+          <q-card class="job-card q-pa-md q-mx-xl" style="width: 40%">
             <q-card-section>
               <div class="text-center">
                 <q-item-label class="text-h6 q-mb-lg"
-                  >Job Listings</q-item-label
+                  ><b>Job Listings</b></q-item-label
                 >
               </div>
               <q-scroll-area style="height: 500px; max-width: 700px">
@@ -202,10 +202,12 @@
           </q-card>
 
           <!-- Favorites Card -->
-          <q-card class="my-card q-pa-md" style="width: 40%">
+          <q-card class="job-card q-pa-md" style="width: 40%">
             <q-card-section>
               <div class="text-center">
-                <q-item-label class="text-h6 q-mb-lg">Favourites</q-item-label>
+                <q-item-label class="text-h6 q-mb-lg"
+                  ><b>Favourites</b></q-item-label
+                >
               </div>
 
               <q-scroll-area style="height: 500px; max-width: 700px">
@@ -561,6 +563,7 @@ const fetchAllApplications = async () => {
     for (const application of response.data) {
       await fetchJobDetails(application.application_id);
     }
+    return response;
   } catch (error) {
     console.error(
       "Error fetching applications:",
@@ -633,34 +636,50 @@ const getJobDetails = async (jobId) => {
   }
 };
 
-// Delete a job application and update UI
 const deleteJob = async (applicationId) => {
   const token = localStorage.getItem("authToken");
-  if (!token) return console.error("Authorization token is missing.");
+  if (!token) {
+    console.error("Authorization token is missing.");
+    return;
+  }
 
   try {
     console.log("Deleting job:", applicationId);
-    await axios.get(
+
+    // delete job
+    const response = await axios.get(
       `https://asp-final-project.onrender.com/v1/application/delete/${applicationId}`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
-    console.log("Job deleted successfully");
+    if (response.data) {
+      console.log("Job deleted successfully");
 
-    // Fetch updated applications
-    const { data: applications } = await axios.get(
-      `https://asp-final-project.onrender.com/v1/application/user/${localStorage.getItem(
-        "user_id"
-      )}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    // Remove deleted job from favorites list
-    const fetchedJobIds = new Set(applications.map((app) => app.job?.job_id));
-    favouritesList.value = favouritesList.value.filter(
-      (job) => job.job?.job_id && fetchedJobIds.has(job.job.job_id) // Check if job and job_id are defined
-    );
+      // Fetch all applications again to reflect the updated list
+      const result = await fetchAllApplications();
 
-    console.log("Updated favourites list:", favouritesList.value);
+      console.log("result.data:", result.data);
+      
+      const jobIdsInFavourites = favouritesList.value.map(
+        (item) => item.job?.job_id
+      );
+
+      console.log("Job IDs in favourites:", jobIdsInFavourites);
+
+      // Extract job_ids from result.data
+      const updatedJobIds = result.data.map((app) => app?.job_id);
+      console.log("Updated job IDs:", updatedJobIds);
+
+      // Filter out jobs in favourites that don't exist in updatedJobIds
+      const filteredFavourites = favouritesList.value.filter((item) =>
+        updatedJobIds.includes(item.job?.job_id)
+      );
+
+      console.log("Filtered favourites list:", filteredFavourites);
+
+      // Update the favouritesList with the filtered list
+      favouritesList.value = filteredFavourites;
+    }
   } catch (error) {
     console.error("Error deleting job:", error.response?.data || error.message);
   }
@@ -680,7 +699,7 @@ onMounted(() => {
   overflow: hidden;
   background-color: white;
 }
-.my-card {
+.job-card {
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
   margin-top: 100px;
 }
