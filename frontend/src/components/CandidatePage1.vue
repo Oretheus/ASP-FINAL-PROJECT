@@ -29,7 +29,17 @@
     <q-page-container>
       <q-page class="q-pa-md">
         <div class="row q-gutter-md justify-center">
-          <q-card class="dashboard-card shadow-3">
+          <q-card
+            class="q-pa-md shadow-3"
+            :style="{
+              width: '1900px',
+              height: '200px',
+              maxWidth: '100%',
+              padding: '20px',
+              borderRadius: '15px',
+              backgroundColor: collectionStore.darkMode ? '#424242' : '#ebf3fb',
+            }"
+          >
             <!-- Flex container for both sections -->
             <div
               class="q-gutter-md column"
@@ -72,6 +82,8 @@
               max-width: 100%;
               box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
               margin-top: 100px;
+              border-radius: 20px;
+              overflow: hidden;
             "
             bordered
           >
@@ -368,6 +380,8 @@ const savedJobs = ref({});
 const favouritesList = ref([]);
 const points = ref(0);
 const streak = ref(0);
+import { useCollectionStore } from "@/stores/mycore";
+const collectionStore = useCollectionStore();
 
 const decodeBase64Results = (results) => {
   return results.map((result) => {
@@ -659,7 +673,7 @@ const deleteJob = async (applicationId) => {
       const result = await fetchAllApplications();
 
       console.log("result.data:", result.data);
-      
+
       const jobIdsInFavourites = favouritesList.value.map(
         (item) => item.job?.job_id
       );
@@ -694,15 +708,11 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.q-card {
-  border-radius: 20px;
-  overflow: hidden;
-  background-color: white;
-}
 .job-card {
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.4);
   margin-top: 100px;
 }
+
 .bg-light-grey {
   background-color: #f5f5f5 !important;
 }
@@ -710,6 +720,7 @@ onMounted(() => {
 .q-card .q-card-section {
   font-size: 16px;
 }
+
 /* Dashboard Card */
 .dashboard-card {
   width: 1900px;
@@ -717,7 +728,7 @@ onMounted(() => {
   max-width: 100%;
   padding: 20px;
   border-radius: 15px;
-  background-color: #ebf3fb !important;
+  background-color: #ebf3fb;
 }
 
 /* Leaderboard Card */
