@@ -178,7 +178,7 @@ function handleRegister() {
   min-height: 100vh;
   padding: 20px;
   font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #6a0dad, #b19cd9);
+  background: linear-gradient(135deg, #ffffff, #1a4d80);
   position: relative;
 }
 
@@ -187,7 +187,7 @@ function handleRegister() {
   top: 20px;
   right: 20px;
   background: white;
-  color: #6a0dad;
+  color: #253588;
   border: none;
   border-radius: 20px;
   padding: 10px 20px;
@@ -198,7 +198,7 @@ function handleRegister() {
 
 .login-btn:hover {
   color: white;
-  background: #6a0dad;
+  background: #1d3891;
 }
 
 .form-layout {
@@ -213,7 +213,7 @@ function handleRegister() {
 
 .left-section {
   flex: 1;
-  background: #6a0dad;
+  background: linear-gradient(135deg, #286ea6, #1a4d80);
   color: white;
   display: flex;
   flex-direction: column;
@@ -244,7 +244,7 @@ function handleRegister() {
 h2 {
   font-size: 24px;
   margin-bottom: 20px;
-  color: #6a0dad;
+  color: #1a4d80;
   text-align: center;
 }
 
@@ -254,7 +254,7 @@ h2 {
 
 .register-btn {
   width: 100%;
-  background-color: #6a0dad;
+  background-color: #1a4d80;
   color: white;
   border: none;
   padding: 12px;
@@ -265,7 +265,7 @@ h2 {
 }
 
 .register-btn:hover {
-  background-color: #5e0cb0;
+  background-color: #5f53e2;
 }
 
 /* Password strength indicator */
