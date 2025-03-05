@@ -1,130 +1,319 @@
 <template>
-  <div class="candidate-container">
-    <!-- Header -->
-    <header class="app-header">
-      <h1>Candidate Application and Task Tracking</h1>
-    </header>
+  <q-layout>
+    <q-header
+      elevated
+      class="q-py-sm"
+      :style="{
+        background: 'linear-gradient(135deg, #286ea6, #1a4d80)',
+        height: '65px',
+        borderBottom: '2px solid #1a4d80',
+      }"
+    >
+      <q-toolbar class="q-pa-none">
+        <q-avatar size="40px" class="q-ml-md">
+          <img src="@/assets/earth.png" alt="Logo" class="earth-icon" />
+        </q-avatar>
 
-    <!-- Content -->
-    <div class="content">
-      <!-- Search Bar -->
-      <SearchBar @search="handleSearch" />
+        <q-space />
 
-      <!-- Main Sections -->
+        <q-tabs align="right" class="q-mr-md">
+          <q-route-tab to="/candidate1">
+            <q-icon name="home" size="30px" />
+          </q-route-tab>
+
+          <q-route-tab to="/candidate2" icon="task" />
+        </q-tabs>
+      </q-toolbar>
+    </q-header>
+    <div class="candidate-container">
+      <q-btn
+        label="Back to Candidate Page 1"
+        @click="goToCandidatePage1"
+        class="q-mt-md"
+        style="background-color: #6a0dad; color: white"
+      />
+
+      <!-- Search Bar for Applications -->
+      <div class="search-section">
+        <SearchBar
+          @search="searchQuery = $event"
+          placeholder="Search applications..."
+        />
+      </div>
+
       <div class="main-sections">
         <!-- Applications Section -->
         <div class="section application-status-section">
-          <ApplicationStatus :applications="filteredApplications" />
+          <h4>Application Status</h4>
+
+          <p v-if="applications.length === 0">No applications found.</p>
+
+          <q-table
+            v-if="filteredApplications.length > 0"
+            class="styled-table"
+            :rows="filteredApplications"
+            :columns="columns"
+            row-key="application_id"
+            virtual-scroll
+            :style="{
+              backgroundColor: collectionStore.darkMode ? '#858282' : '#ffffff',
+            }"
+          >
+            <template v-slot:body="props">
+              <q-tr :props="props">
+                <q-td key="status">{{ props.row.status }}</q-td>
+                <q-td key="job_title">{{ props.row.job_title }}</q-td>
+                <q-td key="company_name">{{ props.row.company_name }}</q-td>
+              </q-tr>
+            </template>
+          </q-table>
+
+          <p v-else>No results match your search.</p>
         </div>
 
-        <!-- Tasks Section -->
+        <!-- Tasks Section (Using TaskListWithFilters Component) -->
         <div class="section task-list-section">
+          <!-- <h2>Task Manager</h2> -->
+
           <TaskListWithFilters
-            :tasks="filteredTasks"
+            :tasks="tasks"
             @add-task="addTask"
             @delete-task="deleteTask"
+            @toggle-task="toggleTaskCompletion"
+            @search="searchTaskQuery = $event"
           />
         </div>
       </div>
     </div>
-  </div>
+  </q-layout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { ref, computed, onMounted, watch } from "vue";
+import axios from "axios";
 import SearchBar from "./CandidatePageComponents/SearchBar.vue";
 import ApplicationStatus from "./CandidatePageComponents/ApplicationStatus.vue";
 import TaskListWithFilters from "./CandidatePageComponents/TaskListWithFilters.vue";
-import { fetchApplications } from "../services/api.js";
-
+import { useCollectionStore } from "@/stores/mycore";
 // State variables
+const loading = ref(true);
+const errorMessage = ref("");
 const searchQuery = ref("");
 const applications = ref([]);
+const searchTaskQuery = ref(""); // For Task Manager Filtering
 const tasks = ref([]);
+const user_id = ref(localStorage.getItem("user_id") || null); // Store logged-in user ID
+const router = useRouter();
 
-// Fetch applications and tasks
-const fetchData = async () => {
-  applications.value = await fetchApplications();
+const collectionStore = useCollectionStore();
+
+const goToCandidatePage1 = () => {
+  router.push("/candidate1"); // Adjust the route if needed
+};
+const columns = [
+  { name: "status", label: "Status", field: "status", align: "left" },
+  { name: "job_title", label: "Job Title", field: "job_title", align: "left" },
+  { name: "company_name", label: "Company Name", field: "company_name", align: "left" },
+];
+
+const fetchApplications = async () => {
+  const token = localStorage.getItem("authToken"); // Get token from localStorage
+  const userId = localStorage.getItem("user_id"); // Get user ID
+
+  console.log("🔹 Stored Token Before Request:", token);
+  console.log("🔹 Stored User ID Before Request:", userId);
+
+  if (!token || !userId) {
+    console.error(" Missing Token or User ID! API request cannot be made.");
+    errorMessage.value = "Authentication error. Please log in again.";
+    loading.value = false;
+    return;
+  }
+
+  try {
+    const response = await axios.get(
+      `https://asp-final-project.onrender.com/v1/application/user/${userId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Include token in headers
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    console.log("✅ API Response:", response.data);
+
+    // Ensure correct data mapping
+    applications.value = response.data.map((app) => ({
+      status: app.status,
+      job_title: extractJobTitle(app.job_id),
+      company_name: extractCompanyName(app.job_id),
+    }));
+  } catch (error) {
+    console.error(" API Fetch Failed:", error.response?.data || error.message);
+    errorMessage.value =
+      error.response?.data?.message || "Failed to fetch applications.";
+  } finally {
+    loading.value = false;
+  }
 };
 
-onMounted(fetchData);
-
-// Computed properties for filtering
-const filteredApplications = computed(() =>
-  applications.value.filter((app) =>
-    app.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-);
-
-const filteredTasks = computed(() =>
-  tasks.value.filter((task) =>
-    task.description.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-);
-
-// Handlers
-const handleSearch = (query) => {
-  searchQuery.value = query;
+// Extract job title and company name from encoded job_id
+const extractJobTitle = (encodedJobId) => {
+  try {
+    const decoded = JSON.parse(atob(encodedJobId));
+    return decoded.job_title || "Unknown Job Title";
+  } catch {
+    return "Unknown Job Title";
+  }
 };
 
-const addTask = (newTask) => {
-  tasks.value.push(newTask);
+const extractCompanyName = (encodedJobId) => {
+  try {
+    const decoded = JSON.parse(atob(encodedJobId));
+    return decoded.company_name || "Unknown Company";
+  } catch {
+    return "Unknown Company";
+  }
+};
+
+//  Fetch user ID & data when component loads
+onMounted(async () => {
+  console.log("🔹 CandidatePage2 is mounted!");
+  user_id.value = localStorage.getItem("user_id") || null;
+  console.log("🔹 Retrieved user_id:", user_id.value);
+
+  if (user_id.value) {
+    await fetchApplications();
+    console.log("✅ Applications fetched:", applications.value);
+  } else {
+    console.warn("⚠️ No user_id found. Applications will not load.");
+  }
+});
+
+/// ✅ Filter Applications (Live Search)
+const filteredApplications = computed(() => {
+  return applications.value.filter((app) => {
+    const query = searchQuery.value.toLowerCase();
+    return (
+      app.job_title.toLowerCase().includes(query) ||
+      app.company_name.toLowerCase().includes(query) ||
+      app.status.toLowerCase().includes(query)
+    );
+  });
+});
+
+// Save tasks to LocalStorage whenever they change
+watch(
+  tasks,
+  (newTasks) => {
+    localStorage.setItem("tasks", JSON.stringify(newTasks));
+  },
+  { deep: true }
+);
+
+// ✅ Task Functions
+const addTask = (task) => {
+  tasks.value.push({ id: Date.now(), ...task, completed: false });
 };
 
 const deleteTask = (taskId) => {
   tasks.value = tasks.value.filter((task) => task.id !== taskId);
 };
+
+const toggleTaskCompletion = (taskId) => {
+  const task = tasks.value.find((t) => t.id === taskId);
+  if (task) {
+    task.completed = !task.completed;
+  }
+};
 </script>
 
-<style scoped>
-
+ <style scoped>
 /* General Layout */
-.candidate-container
-{
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.candidate-container {
+  width: 90%;
+  margin: auto;
   font-family: Arial, sans-serif;
-  background: #f8faff;
-  padding: 20px;
 }
 
-.app-header
-{
-  background: linear-gradient(135deg, #6a0dad, #b19cd9);
-  color: white;
-  padding: 20px;
-  text-align: center;
-  font-size: 24px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Search Section */
+.search-section {
+  margin-top: 100px;
+  margin-bottom: 15px;
 }
 
-.content
-{
+/* Table Styling */
+.styled-table {
   width: 100%;
-  max-width: 1200px;
-  padding: 20px;
-  background: white;
-  border: 1px solid #e1e8f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-collapse: collapse;
+  margin-top: 10px;
 }
 
-.main-sections
-{
+.styled-table th,
+.styled-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: left;
+}
+
+/* Sections */
+.main-sections {
   display: flex;
-  gap: 20px;
-  margin-top: 20px;
+  justify-content: space-between;
 }
 
-.section
-{
-  flex: 1;
-  background-color: white;
-  border: 1px solid #e1e8f0;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.application-status-section {
+  width: 60%;
+}
+
+.task-list-section {
+  width: 35%;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+/* Task Manager */
+.task-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.task-input input {
+  padding: 5px;
+  border: 1px solid #ccc;
+}
+
+.task-input button {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.task-list-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.task-list-section li {
+  display: flex;
+  justify-content: space-between;
+  background: white;
+  padding: 5px;
+  margin-bottom: 5px;
+  border-radius: 3px;
+}
+
+.task-list-section button {
+  background: red;
+  color: white;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
 }
 </style>
