@@ -1,134 +1,98 @@
 <template>
-  <div class="task-list">
-    <h2>Tasks</h2>
-    <!-- Filter Dropdown -->
-    <div class="filters">
-      <label for="filter">Filter Tasks:</label>
-      <select id="filter" v-model="filter">
-        <option value="All">All</option>
-        <option value="Completed">Completed</option>
-        <option value="Pending">Pending</option>
-      </select>
-    </div>
+  <q-card class="q-pa-md">
+    <q-card-section>
+      <h4>Tasks</h4>
 
-    <!-- Task List -->
-    <ul v-if="filteredTasks.length">
-      <li v-for="task in filteredTasks" :key="task.id">
-        <label>
-          <input
-            type="checkbox"
-            v-model="task.completed"
-            @change="completeTask(task)"
-          />
-          {{ task.description }}
-        </label>
-        <button class="delete-btn" @click="deleteTask(task.id)">Delete</button>
-      </li>
-    </ul>
-    <p v-else>No tasks available. Add a new task to get started!</p>
+      <!-- Filter Dropdown -->
+      <div class="q-mb-md">
+        <q-select
+          label="Filter Tasks"
+          v-model="filter"
+          :options="filterOptions"
+          outlined
+          dense
+        />
+      </div>
+
+      <!-- Task List -->
+      <q-list v-if="filteredTasks.length" bordered separator>
+        <q-item v-for="task in filteredTasks" :key="task.id">
+          <q-item-section avatar>
+            <q-checkbox v-model="task.completed" @update:model-value="completeTask(task)" />
+          </q-item-section>
+          <q-item-section>{{ task.description }}</q-item-section>
+          <q-item-section side>
+            <q-btn flat color="red" icon="delete" @click="deleteTask(task.id)" />
+          </q-item-section>
+        </q-item>
+      </q-list>
+
+      <q-banner v-else class="text-grey">
+        No tasks available. Add a new task to get started!
+      </q-banner>
+    </q-card-section>
 
     <!-- Add Task Form -->
-    <div class="add-task">
-      <h3>Add a New Task</h3>
-      <form @submit.prevent="addTask">
-        <input
-          type="text"
-          v-model="newTask"
-          placeholder="Enter new task description"
-          required
-        />
-        <button type="submit" class="add-btn">Add Task</button>
-      </form>
-    </div>
-  </div>
+    <q-separator />
+
+    <q-card-section>
+      <h5>Add a New Task</h5>
+      <q-form @submit.prevent="addTask">
+        <q-input v-model="newTask" label="Enter new task description" outlined dense required />
+        <q-btn type="submit" color="primary" label="Add Task" class="q-mt-md" />
+      </q-form>
+    </q-card-section>
+  </q-card>
 </template>
 
-<script>
-export default {
-  props: ['tasks'],
-  data() {
-    return {
-      filter: 'All', // Task filter (All, Completed, Pending)
-      newTask: '', // Input for the new task description
-    };
-  },
-  computed: {
-    filteredTasks() {
-      // Filters tasks based on the selected filter
-      if (this.filter === 'All') return this.tasks;
-      return this.tasks.filter(
-        (task) => (this.filter === 'Completed' ? task.completed : !task.completed)
-      );
-    },
-  },
-  methods: {
-    completeTask(task) {
-      // Alerts when a task's completion status changes
-      alert(`Task ${task.completed ? 'completed' : 'incomplete'}: ${task.description}`);
-    },
-    addTask() {
-      // Emits an event to add a new task
-      const newTaskObject = {
-        id: Date.now(), // Unique ID for the new task
-        description: this.newTask,
-        completed: false,
-      };
-      this.$emit('add-task', newTaskObject); // Sends new task to the parent
-      this.newTask = ''; // Clears the input field
-    },
-    deleteTask(taskId) {
-      // Emits an event to delete a task
-      this.$emit('delete-task', taskId);
-    },
-  },
+<script setup>
+import { defineProps, defineEmits, ref, computed } from "vue";
+import { useQuasar } from "quasar";
+
+const props = defineProps({
+  tasks: Array,
+});
+
+const emit = defineEmits(["add-task", "delete-task"]);
+
+const $q = useQuasar();
+const filter = ref("All");
+const newTask = ref("");
+const filterOptions = ["All", "Completed", "Pending"];
+
+const filteredTasks = computed(() => {
+  if (filter.value === "All") return props.tasks;
+  return props.tasks.filter((task) => (filter.value === "Completed" ? task.completed : !task.completed));
+});
+
+const completeTask = (task) => {
+  $q.notify({
+    message: `Task ${task.completed ? "completed" : "marked incomplete"}: ${task.description}`,
+    color: task.completed ? "green" : "orange",
+    position: "top",
+  });
+};
+
+const addTask = () => {
+  if (!newTask.value.trim()) return;
+
+  const newTaskObject = {
+    id: Date.now(),
+    description: newTask.value,
+    completed: false,
+  };
+  emit("add-task", newTaskObject);
+  newTask.value = "";
+};
+
+const deleteTask = (taskId) => {
+  emit("delete-task", taskId);
 };
 </script>
 
-<style>
-.task-list .filters
-{
-  margin-bottom: 10px;
-}
-
-.task-list ul
-{
-  padding: 0;
-  list-style: none;
-}
-
-.task-list li
-{
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 10px 0;
-}
-
-.add-task
-{
-  margin-top: 20px;
-}
-
-.add-btn,
-.delete-btn
-{
-  background-color: #6a0dad;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.add-btn:hover,
-.delete-btn:hover 
-{
-  color:#6a0dad;
-  border:solid 1px;
-  border-color:#6a0dad;
-  background-color: white;
+<style scoped>
+.q-card {
+  max-width: 500px;
+  margin: auto;
 }
 </style>
-  
-  
-  
