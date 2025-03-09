@@ -52,8 +52,15 @@ class UserManager:
             # Search by email
             user_data = await self.firebase_manager.get_user_data("users", username)
         else:
-            # TODO: Search by username -> update to async
-            user_docs = self.firebase_manager.db.collection("users").where("username", "==", username).stream()
+            # Search by username (update to async)
+            loop = asyncio.get_event_loop()
+            user_docs = await loop.run_in_executor(
+                None,
+                lambda: self.firebase_manager.db
+                    .collection("users")
+                    .where("username", "==", username)
+                    .stream()
+            )
             user_data = None
             for doc in user_docs:
                 user_data = doc.to_dict()
